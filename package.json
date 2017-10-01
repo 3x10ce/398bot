@@ -1,0 +1,26 @@
+{
+  "name": "398bot",
+  "version": "0.0.1",
+  "description": "Twitter bot of Sakuya Izayoi (from touhou project)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/3x10ce/398bot.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/3x10ce/398bot/issues"
+  },
+  "homepage": "https://github.com/3x10ce/398bot#readme",
+  "dependencies": {
+    "chai": "^4.1.2",
+    "dotenv": "^4.0.0",
+    "eslint": "^4.8.0",
+    "mocha": "^3.5.3",
+    "twitter": "^1.7.1"
+  }
+}
