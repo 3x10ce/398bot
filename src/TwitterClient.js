@@ -20,6 +20,24 @@ const TwitterClient = class {
       stream.on('event', on.event)
     })
   }
+
+  /**
+   * idで指定したユーザをfollowする
+   * @param {string} id 対象のUser ID
+   * @return {Promise} 結果をresolve/rejectするPromiseオブジェクト
+   */
+  follow (id) {
+    return this.twitter.post('friendships/create', {id: id})
+  }
+
+  /**
+   * idで指定したユーザをremoveする
+   * @param {string} id 対象のUser ID
+   * @return {Promise} 結果をresolve/rejectするPromiseオブジェクト
+   */
+  remove (id) {
+    return this.twitter.post('friendships/destroy', {id: id})
+  }
 }
 
 module.exports = TwitterClient
