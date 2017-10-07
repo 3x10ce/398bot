@@ -21,6 +21,20 @@ const TwitterClient = class {
     })
   }
 
+  /** 
+   * ツイートする
+   * @param {string} text ツイート内容
+   * @param {TweetObject} reply_to (optional) 返信先のツイート
+   * @return {Promise} 結果をresolve/rejectするPromiseオブジェクト */
+  tweet (text, reply_to) {
+    let params = { status: text }
+    if (reply_to) {
+      params.text = '@' + reply_to.user.screen_name + ' ' + params.text
+      params.in_reply_to_status_id = reply_to.id_str
+    }
+    return this.twitter.post('statuses/update', params)
+  }
+
   /**
    * idで指定したユーザをfollowする
    * @param {string} id 対象のUser ID
