@@ -23,5 +23,8 @@
     "eslint": "^4.8.0",
     "mocha": "^3.5.3",
     "twitter": "^1.7.1"
+  },
+  "devDependencies": {
+    "sinon": "^4.0.1"
   }
 }

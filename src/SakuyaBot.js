@@ -15,7 +15,10 @@ const SakuyaBot = class {
   }
 
   read (tweet) {
-    console.dir(tweet)
+    // 返信する
+    if (tweet.text.match(/テスト/)) {
+      this.client.tweet('テスト返信')
+    }
   }
 
   receive (event) {
