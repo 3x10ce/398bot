@@ -9,6 +9,8 @@
   "globals": {},
   "rules": {
     "no-console": "off",
-    "semi": ["error", "never"]
+    "semi": ["error", "never"],
+    "eqeqeq": "error",
+    "indent": ["error", 2]
   }
 }
