@@ -22,7 +22,13 @@ const SakuyaBot = class {
   }
 
   receive (event) {
-    console.dir(event)
+    // フォローイベント
+    if (event.event === 'follow') {
+      // Follower数がFollow数の15%以上であればフォローする
+      if (event.target.friends_count * 0.15 < event.target.followers_count) {
+        this.client.follow(event.target.id_str)
+      }
+    }
   }
 }
 
