@@ -1,8 +1,9 @@
 'use strict'
 
 const SakuyaBot = class {
-  constructor (client) {
+  constructor (client, db) {
     this.client = client
+    this.db = db
   }
   
   start () {

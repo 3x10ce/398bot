@@ -1,5 +1,3 @@
-let MongoDb = require('mongodb').Db
-let MongoServer = require('mongodb').Server
 
 let SakuyaDb = class {
   constructor (db) {
@@ -17,10 +15,20 @@ let SakuyaDb = class {
   }
 
   createUser (user) {
-    let collection = db.collection('users')
+    let collection = this.db.collection('users')
     collection.insertOne({
       'id': user.id_str,
       'name': user.name
     })
   }
+
+  updateUser (user, data) {
+    let collection = this.db.collection('users')
+    collection.findOneAndUpdate({
+      'id': user.id_str      
+    }, data)
+
+  }
 }
+
+module.exports = SakuyaDb
