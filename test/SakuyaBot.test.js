@@ -37,7 +37,7 @@ describe('口上反応テスト', () => {
   it('テスト口上', () => {
     let tweet = createTweetMock()
     tweet.text = 'テスト'
-    client_mock.expects('tweet').once().withArgs('テスト返信')
+    client_mock.expects('tweet').once().withArgs('テスト返信', tweet.user)
 
     sakuyaBot.read(tweet)
 

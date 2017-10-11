@@ -17,7 +17,7 @@ const SakuyaBot = class {
   read (tweet) {
     // 返信する
     if (tweet.text.match(/テスト/)) {
-      this.client.tweet('テスト返信')
+      this.client.tweet('テスト返信', tweet.user)
     }
   }
 
