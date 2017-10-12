@@ -14,9 +14,14 @@ let SakuyaDb = class {
     })
   }
 
+  /**
+   * ユーザのドキュメントを作成します。
+   * @param {UserObject} user TwitterのUser Object
+   * @return insertの結果
+   */
   createUser (user) {
     let collection = this.db.collection('users')
-    collection.insertOne({
+    return collection.insertOne({
       '_id': user.id_str,
       'name': user.name,
       'nickname': ':NAME:さん',
@@ -24,19 +29,37 @@ let SakuyaDb = class {
     })
   }
 
+  /**
+   * ユーザのドキュメントを更新します。
+   * @param {string} id Twitter の User ID (id_str)
+   * @param {object} data 更新するデータのクエリ
+   * @return updateの結果
+   */
   _updateUser (id, data) {
     let collection = this.db.collection('users')
-    collection.findOneAndUpdate({
+    return collection.findOneAndUpdate({
       '_id': id
     }, data)
   }
 
+  /**
+   * 指定したIDのユーザにニックネームを設定します。
+   * @param {string} id Twitter の User ID (id_str)
+   * @param {string} nickname ニックネーム
+   * @return updateの結果
+   */
   setNickname (id, nickname) {
     return this._updateUser(id,
       {$set:{ 'nickname': nickname}}
     )
   }
 
+  /**
+   * 指定したIDのユーザの好感度を増減します。
+   * @param {string} id Twitter の User ID (id_str)
+   * @param {number} incremental 増減量
+   * @return updateの結果
+   */
   incraseLovelity (id, incremental) {
     return this._updateUser(id, 
       {$inc:{ 'lovelity': incremental}}
