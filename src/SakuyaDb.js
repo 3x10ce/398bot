@@ -43,3 +43,5 @@ let SakuyaDb = class {
     )
   }
 }
+
+module.exports = SakuyaDb
