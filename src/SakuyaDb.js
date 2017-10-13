@@ -29,6 +29,16 @@ let SakuyaDb = class {
     })
   }
 
+  /** 
+   * ユーザデータを取得します。
+   * @param {string} user id
+   * @return ユーザデータ
+   */
+  getUser (id) {
+    let collection = this.db.collection('user')
+    return collection.findOne({ '_id': id})
+  }
+
   /**
    * ユーザのドキュメントを更新します。
    * @param {string} id Twitter の User ID (id_str)
