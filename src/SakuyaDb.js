@@ -70,7 +70,7 @@ let SakuyaDb = class {
    * @param {number} incremental 増減量
    * @return updateの結果
    */
-  incraseLovelity (id, incremental) {
+  increaseLovelity (id, incremental) {
     return this._updateUser(id, 
       {$inc:{ 'lovelity': incremental}}
     )

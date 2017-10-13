@@ -10,6 +10,20 @@ let createTweetMock = () => ({
   user: createUserMock()
 })
 
+// 適当なuser data を生成する
+let createUserDataMock = () => ({
+  _id: '0',
+  name: 'Masashi',
+  nickname: 'Massie',
+  lovelity: 20
+})
+// dbのmock/stub
+let db = {
+  createUser: (user) => user,
+  getUser: (id) => sinon.stub().returns(createUserDataMock()),
+  setNickname: (id, nickname) => [id, nickname],
+  increaseLovelity: (id, lovelity) => [id, lovelity]
+}
 
 // 適当なUserのmockを作成する
 let createUserMock = () => ({
@@ -25,20 +39,33 @@ let client = {
   follow: (id) => id
 }
 
-let client_mock = sinon.mock(client)
+let sakuyaBot = new SakuyaBot(client, db)
 
-let sakuyaBot = new SakuyaBot(client)
 /* SakuyaBot test*/
 
 describe('口上反応テスト', () => {
-  beforeEach(() => {
+  afterEach( () => {
 
+  })
+  it('反応しない', () => {
+    let tweet = createTweetMock()
+
+    tweet.text = 'ignored tweet'
+    // ツイートを返さないことを期待
+    let client_mock = sinon.mock(client)
+    client_mock.expects('tweet').never()
+    sakuyaBot.read(tweet)
+
+    client_mock.verify()
+    
   })
   it('テスト口上', () => {
     let tweet = createTweetMock()
     tweet.text = 'テスト'
+    // テスト返信を期待
+    let client_mock = sinon.mock(client)
     client_mock.expects('tweet').once().withArgs('テスト返信', tweet.user)
-
+    
     sakuyaBot.read(tweet)
 
     client_mock.verify()
@@ -46,6 +73,9 @@ describe('口上反応テスト', () => {
 })
 
 describe('フォローチェックテスト', () => {
+  beforeEach( () => {
+    sakuyaBot = new SakuyaBot(client, db)
+  })
   it('通常のフォロー返しフロー', () => {
     let event = {
       event: 'follow',
@@ -56,6 +86,7 @@ describe('フォローチェックテスト', () => {
     event.target.friends_count = 100
 
     // フォローを返すことを期待
+    let client_mock = sinon.mock(client)
     client_mock.expects('follow').once().withArgs('0')
 
     sakuyaBot.receive(event)
@@ -73,6 +104,7 @@ describe('フォローチェックテスト', () => {
     event.target.friends_count = 100
 
     // フォローを返さないことを期待
+    let client_mock = sinon.mock(client)
     client_mock.expects('follow').never()
 
     sakuyaBot.receive(event)
@@ -90,6 +122,7 @@ describe('フォローチェックテスト', () => {
     event.target.friends_count = 1
 
     // フォローを返さないことを期待
+    let client_mock = sinon.mock(client)
     client_mock.expects('follow').never()
 
     sakuyaBot.receive(event)

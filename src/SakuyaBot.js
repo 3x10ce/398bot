@@ -16,9 +16,14 @@ const SakuyaBot = class {
   }
 
   read (tweet) {
+    // ユーザの情報をDBから取得する
+    let userdata = this.db.getUser(tweet.user.id)
+
     // 返信する
     if (tweet.text.match(/テスト/)) {
       this.client.tweet('テスト返信', tweet.user)
+    } else if (tweet.text.match(/こんにちは/)) {
+      this.client.tweet(`${userdata.nickname}さん、こんにちは。`, tweet.user)
     }
   }
 
