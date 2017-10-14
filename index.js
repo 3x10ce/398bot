@@ -20,8 +20,8 @@ let twitter = new Twitter ({
 let client = new TwitterClient(twitter)
 
 // DB instance生成
-let server = new MongoServer('localhost', 27017)
-let db = new MongoDb('SakuyaBot', server, {safe: true})
+let server = new MongoServer(process.env.mongo_server, process.env.mongo_port)
+let db = new MongoDb(process.env.mongo_database, server, {safe: true})
 
 let sdb = new SakuyaDb(db)
 
@@ -29,5 +29,5 @@ let sakuyaBot = new SakuyaBot(client, sdb)
 sakuyaBot.start()
 
 let autoRemove = new FollowCrawler(client)
-autoRemove.start(5)
+autoRemove.start()
 
