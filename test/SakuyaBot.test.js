@@ -20,7 +20,7 @@ let createUserDataMock = () => ({
 // dbのmock/stub
 let db = {
   createUser: (user) => user,
-  getUser: (id) => sinon.stub().returns(createUserDataMock()),
+  getUser: (id) => sinon.stub().returns(createUserDataMock(id)),
   setNickname: (id, nickname) => [id, nickname],
   increaseLovelity: (id, lovelity) => [id, lovelity]
 }
@@ -40,7 +40,7 @@ let client = {
 }
 
 let sakuyaBot = new SakuyaBot(client, db)
-
+sakuyaBot.teaSelector = () => ({name: '(紅茶名)', language_of: '(花言葉)', rarity: 1})
 /* SakuyaBot test*/
 
 describe('口上反応テスト', () => {
@@ -66,6 +66,20 @@ describe('口上反応テスト', () => {
     let client_mock = sinon.mock(client)
     client_mock.expects('tweet').once().withArgs('テスト返信', tweet.user)
     
+    sakuyaBot.read(tweet)
+
+    client_mock.verify()
+  })
+  it('紅茶を入れる', () => {
+    let tweet = createTweetMock()
+    tweet.text = '紅茶'
+
+    // テスト返信を期待
+    let client_mock = sinon.mock(client)
+    client_mock.expects('tweet').once().withArgs(
+      'はい、(紅茶名)を淹れてみましたわ。花言葉は(花言葉)ね。召し上がれ。', tweet.user
+    )
+
     sakuyaBot.read(tweet)
 
     client_mock.verify()
