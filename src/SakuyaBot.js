@@ -7,7 +7,7 @@ const SakuyaBot = class {
     this.client = client
     this.db = db
 
-    this.teaSelector = require('./Teapot.js')    
+    this.teaSelector = require('./Teapot.js')
   }
   
   start () {
@@ -21,7 +21,15 @@ const SakuyaBot = class {
 
   read (tweet) {
     // ユーザの情報をDBから取得する
-    let userdata = this.db.getUser(tweet.user.id)
+    let userdata
+    this.db.getUser(tweet.user.id).resolve( (user) => {
+      userdata = user
+    })
+    if (userdata === null) {
+      this.db.createUser(tweet.user).resolve( (user) => {
+        userdata = user
+      })
+    }
 
     // 返信する
     if (tweet.text.match(/テスト/)) {
