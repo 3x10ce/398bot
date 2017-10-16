@@ -35,7 +35,7 @@ let SakuyaDb = class {
    * @return ユーザデータ
    */
   getUser (id) {
-    let collection = this.db.collection('user')
+    let collection = this.db.collection('users')
     return collection.findOne({ '_id': id})
   }
 
