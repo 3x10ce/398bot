@@ -20,7 +20,7 @@ let createUserDataMock = () => ({
 // dbのmock/stub
 let db = {
   createUser: (user) => user,
-  getUser: (id) => sinon.stub().returns(createUserDataMock(id)),
+  getUser: (id) => ({then: () => sinon.stub().returns(createUserDataMock(id))}),
   setNickname: (id, nickname) => [id, nickname],
   increaseLovelity: (id, lovelity) => [id, lovelity]
 }

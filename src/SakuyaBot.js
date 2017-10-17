@@ -22,11 +22,11 @@ const SakuyaBot = class {
   read (tweet) {
     // ユーザの情報をDBから取得する
     let userdata
-    this.db.getUser(tweet.user.id).resolve( (user) => {
+    this.db.getUser(tweet.user.id).then( (user) => {
       userdata = user
     })
     if (userdata === null) {
-      this.db.createUser(tweet.user).resolve( (user) => {
+      this.db.createUser(tweet.user).then( (user) => {
         userdata = user
       })
     }
