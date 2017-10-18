@@ -8,6 +8,22 @@ const SakuyaBot = class {
     this.db = db
 
     this.teaSelector = require('./Teapot.js')
+    console.dir(client)
+    
+    // 起動時にアカウントの有効性を確認する
+    this.client.verifyCredentials().then(
+      (res) => {
+        this.name = res.name
+        this.screen_name = res.screen_name
+        this.id = res.id_str
+        console.log('Account verification succeed!')
+        console.dir(this)
+      }
+    ).catch(
+      () => {
+        console.error('Account verification failed.')
+      }
+    )
   }
   
   start () {
