@@ -34,11 +34,19 @@ const SakuyaBot = class {
     // 返信する
     if (tweet.text.match(/テスト/)) {
       this.client.tweet('テスト返信', tweet.user)
+
     } else if (tweet.text.match(/こんにちは/)) {
       this.client.tweet(`${userdata.nickname}さん、こんにちは。`, tweet.user)
+
     } else if (tweet.text.match(/紅茶/)) {
       let tea = this.teaSelector()
       this.client.tweet(`はい、${tea.name}を淹れてみましたわ。花言葉は${tea.language_of}ね。召し上がれ。`, tweet.user)
+
+    } else if (tweet.text.match(/誕生日/)) {
+      let [, m, d] = (tweet.text.match(/誕生日は([0-9]+月[0-9]+日)/) || [] )
+      if( m !== undefined && d !== undefined) {
+        this.client.tweet(`あなたの誕生日は${m}月${d}日なのね。`, tweet.user)
+      }
     }
   }
 
