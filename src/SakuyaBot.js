@@ -16,8 +16,6 @@ const SakuyaBot = class {
         this.name = res.name
         this.screen_name = res.screen_name
         this.id = res.id_str
-        console.log('Account verification succeed!')
-        console.dir(this)
       }
     ).catch(
       () => {

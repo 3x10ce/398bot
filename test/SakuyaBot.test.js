@@ -35,6 +35,8 @@ let createUserMock = () => ({
 
 // clientのmock
 let client = {
+  verifyCredentials: () => 
+    new Promise((r) => {r({id_str:'0000', name: 'SakuyaTest', screen_name: '398Bot'})}),
   tweet: (text) => text,
   follow: (id) => id
 }

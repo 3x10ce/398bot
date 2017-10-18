@@ -10,6 +10,14 @@ const TwitterClient = class {
   }
 
   /**
+   * アカウントの有効状態を確認する
+   * @return {promise} 
+   */
+  verifyCredentials () {
+    return this.twitter.get('account/verify_credentials', {})
+  }
+
+  /**
    * UserStreamのlistenを開始する
    * @param {object} on コールバック関数を格納したオブジェクト
    */
