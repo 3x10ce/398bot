@@ -25,6 +25,7 @@ let SakuyaDb = class {
       '_id': user.id_str,
       'name': user.name,
       'nickname': ':NAME:さん',
+      'birthday': null,
       'lovelity': 5
     })
   }
@@ -61,6 +62,21 @@ let SakuyaDb = class {
   setNickname (id, nickname) {
     return this._updateUser(id,
       {$set:{ 'nickname': nickname}}
+    )
+  }
+
+
+  /**
+   * 指定したIDのユーザの誕生日を設定します。
+   * @param {string} id Twitter の User ID (id_str)
+   * @param {number} month 誕生月
+   * @param {number} day 誕生日
+   * @return updateの結果
+   * [hint]月と日のみで管理する。Date.yearは2000でMASKする。
+   */
+  setBirthday (id, month, day) {
+    return this._updateUser(id,
+      {$set:{ 'birthday': new Date(2000, month-1, day, 9)}}
     )
   }
 
