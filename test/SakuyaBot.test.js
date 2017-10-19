@@ -86,6 +86,20 @@ describe('口上反応テスト', () => {
 
     client_mock.verify()
   })
+  it('誕生日', () => {
+    let tweet = createTweetMock()
+    tweet.text = '誕生日は10月15日'
+
+    // テスト返信を期待
+    let client_mock = sinon.mock(client)
+    client_mock.expects('tweet').once().withArgs(
+      'あなたの誕生日は10月15日なのね。', tweet.user
+    )
+
+    sakuyaBot.read(tweet)
+
+    client_mock.verify()
+  })
 })
 
 describe('フォローチェックテスト', () => {
