@@ -33,6 +33,13 @@ const SakuyaBot = class {
   }
 
   read (tweet) {
+    // 自身以外へのrepliesを除外する
+    let replies = (tweet.text.match(/@[0-9a-zA-Z]+/g) || []).filter((u) => u !== `@${this.screen_name}`)
+    if (replies.length) return
+    
+    // 先頭が@でないツイートには反応しない
+    if (!tweet.text.startsWith('@')) return
+    
     // ユーザの情報をDBから取得する
     let userdata
     this.db.getUser(tweet.user.id).then( (user) => {

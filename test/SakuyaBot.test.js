@@ -22,6 +22,7 @@ let db = {
   createUser: (user) => user,
   getUser: (id) => ({then: () => sinon.stub().returns(createUserDataMock(id))}),
   setNickname: (id, nickname) => [id, nickname],
+  setBirthday: (id, m, d) => [id, m, d],
   increaseLovelity: (id, lovelity) => [id, lovelity]
 }
 
@@ -63,7 +64,7 @@ describe('口上反応テスト', () => {
   })
   it('テスト口上', () => {
     let tweet = createTweetMock()
-    tweet.text = 'テスト'
+    tweet.text = '@398Bot テスト'
     // テスト返信を期待
     let client_mock = sinon.mock(client)
     client_mock.expects('tweet').once().withArgs('テスト返信', tweet.user)
@@ -74,7 +75,7 @@ describe('口上反応テスト', () => {
   })
   it('紅茶を入れる', () => {
     let tweet = createTweetMock()
-    tweet.text = '紅茶'
+    tweet.text = '@398Bot 紅茶'
 
     // テスト返信を期待
     let client_mock = sinon.mock(client)
@@ -88,13 +89,75 @@ describe('口上反応テスト', () => {
   })
   it('誕生日', () => {
     let tweet = createTweetMock()
-    tweet.text = '誕生日は10月15日'
+    tweet.text = '@398Bot 誕生日は10月15日'
 
     // テスト返信を期待
     let client_mock = sinon.mock(client)
     client_mock.expects('tweet').once().withArgs(
       'あなたの誕生日は10月15日なのね。', tweet.user
     )
+
+    sakuyaBot.read(tweet)
+
+    client_mock.verify()
+  })
+  it('リプライでないツイートには反応しない', () => {
+    let tweet = createTweetMock()
+    tweet.text = 'テスト'
+
+    // テスト返信しないことを期待
+    let client_mock = sinon.mock(client)
+    client_mock.expects('tweet').never()
+
+    sakuyaBot.read(tweet)
+
+    client_mock.verify()
+
+  })
+  it('他の人あてのリプライには反応しない', () => {
+    let tweet = createTweetMock()
+    tweet.text = '@3x10ce テスト'
+
+    // テスト返信しないことを期待
+    let client_mock = sinon.mock(client)
+    client_mock.expects('tweet').never()
+
+    sakuyaBot.read(tweet)
+
+    client_mock.verify()
+
+  })
+  it('自分以外へのリプライが混ざっている場合は反応しない', () => {
+    let tweet = createTweetMock()
+    tweet.text = '@398Bot @3x10ce テスト'
+
+    // テスト返信しないことを期待
+    let client_mock = sinon.mock(client)
+    client_mock.expects('tweet').never()
+
+    sakuyaBot.read(tweet)
+
+    client_mock.verify()
+  })
+  it('自分以外へのリプライが混ざっている場合は反応しない', () => {
+    let tweet = createTweetMock()
+    tweet.text = '@398Bot @3x10ce テスト'
+
+    // テスト返信しないことを期待
+    let client_mock = sinon.mock(client)
+    client_mock.expects('tweet').never()
+
+    sakuyaBot.read(tweet)
+
+    client_mock.verify()
+  })
+  it('ツイート途中に自分の@が混ざっている場合は反応しない', () => {
+    let tweet = createTweetMock()
+    tweet.text = 'これは @398Bot テスト'
+
+    // テスト返信しないことを期待
+    let client_mock = sinon.mock(client)
+    client_mock.expects('tweet').never()
 
     sakuyaBot.read(tweet)
 
