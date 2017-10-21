@@ -270,8 +270,25 @@ let teaList = [
   {name:'匂い菫(ニオイスミレ)', language_of: '[秘密の愛][高尚][控えた美しさ]', rarity: 2},
 ]
 
-
-module.exports = function selectTea() {
-  let choice = Math.floor(Math.random() * teaList.length)
+module.exports = function selectTea(user) {
+  let choice = Math.abs(randomChoice(user)) % teaList.length 
+  console.log(choice)
   return teaList[choice]
+}
+
+/**
+ * ユーザIDと今日の日付をシードとし、乱数を生成します。
+ * @param {number} -2^31 〜 2^31-1 の乱数
+ */
+let randomChoice = (user) => {
+  let x = 163981341
+  let y = 398398398
+  let z = 134134116  
+  let w = user.id_str.substr(-9) * 1 ^ ( new Date().getTime()/86400|0)
+  let t
+
+  // XorShift
+  t = x ^ (x << 11)
+  x = y; y = z; z = w
+  return (w ^ (w >>> 19)) ^ (t ^ (t >>> 8))
 }
