@@ -25,6 +25,15 @@ let db = {
   setBirthday: (id, m, d) => [id, m, d],
   increaseLovelity: (id, lovelity) => [id, lovelity]
 }
+// logのmock
+let logger = {
+  trace: (l) => l,
+  debug: (l) => l,
+  info: (l) => l,
+  warn: (l) => l,
+  error: (l) => l,
+  fatal: (l) => l
+}
 
 // 適当なUserのmockを作成する
 let createUserMock = () => ({
@@ -42,7 +51,7 @@ let client = {
   follow: (id) => id
 }
 
-let sakuyaBot = new SakuyaBot(client, db)
+let sakuyaBot = new SakuyaBot(client, db, logger)
 sakuyaBot.teaSelector = () => ({name: '(紅茶名)', language_of: '(花言葉)', rarity: 1})
 /* SakuyaBot test*/
 
@@ -167,7 +176,7 @@ describe('口上反応テスト', () => {
 
 describe('フォローチェックテスト', () => {
   beforeEach( () => {
-    sakuyaBot = new SakuyaBot(client, db)
+    sakuyaBot = new SakuyaBot(client, db, logger)
   })
   it('通常のフォロー返しフロー', () => {
     let event = {

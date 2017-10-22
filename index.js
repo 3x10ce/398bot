@@ -19,13 +19,20 @@ let twitter = new Twitter ({
 })
 let client = new TwitterClient(twitter)
 
+// Logger
+let log4js = require('log4js')
+log4js.configure('log4js.conf', { reloadSecs: 600 })
+
+let logger = log4js.getLogger('system')
+
+
 // DB instance生成
 let server = new MongoServer(process.env.mongo_server, process.env.mongo_port)
 let db = new MongoDb(process.env.mongo_database, server, {safe: true})
 
 let sdb = new SakuyaDb(db)
 
-let sakuyaBot = new SakuyaBot(client, sdb)
+let sakuyaBot = new SakuyaBot(client, sdb, logger)
 sakuyaBot.start()
 
 let autoRemove = new FollowCrawler(client)
