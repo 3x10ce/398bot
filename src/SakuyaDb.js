@@ -32,35 +32,35 @@ let SakuyaDb = class {
 
   /** 
    * ユーザデータを取得します。
-   * @param {string} user id
+   * @param {UserObject} user TwitterのUser Object
    * @return ユーザデータ
    */
-  getUser (id) {
+  getUser (user) {
     let collection = this.db.collection('users')
-    return collection.findOne({ '_id': id})
+    return collection.findOne({ '_id': user.id_str})
   }
 
   /**
    * ユーザのドキュメントを更新します。
-   * @param {string} id Twitter の User ID (id_str)
+   * @param {UserObject} user TwitterのUser Object
    * @param {object} data 更新するデータのクエリ
    * @return updateの結果
    */
-  _updateUser (id, data) {
+  _updateUser (user, data) {
     let collection = this.db.collection('users')
     return collection.findOneAndUpdate({
-      '_id': id
+      '_id': user.id_str
     }, data)
   }
 
   /**
    * 指定したIDのユーザにニックネームを設定します。
-   * @param {string} id Twitter の User ID (id_str)
+   * @param {UserObject} user TwitterのUser Object
    * @param {string} nickname ニックネーム
    * @return updateの結果
    */
-  setNickname (id, nickname) {
-    return this._updateUser(id,
+  setNickname (user, nickname) {
+    return this._updateUser(user,
       {$set:{ 'nickname': nickname}}
     )
   }
@@ -68,26 +68,26 @@ let SakuyaDb = class {
 
   /**
    * 指定したIDのユーザの誕生日を設定します。
-   * @param {string} id Twitter の User ID (id_str)
+   * @param {UserObject} user TwitterのUser Object
    * @param {number} month 誕生月
    * @param {number} day 誕生日
    * @return updateの結果
    * [hint]月と日のみで管理する。Date.yearは2000でMASKする。
    */
-  setBirthday (id, month, day) {
-    return this._updateUser(id,
+  setBirthday (user, month, day) {
+    return this._updateUser(user,
       {$set:{ 'birthday': new Date(2000, month-1, day, 9)}}
     )
   }
 
   /**
    * 指定したIDのユーザの好感度を増減します。
-   * @param {string} id Twitter の User ID (id_str)
+   * @param {UserObject} user TwitterのUser Object
    * @param {number} incremental 増減量
    * @return updateの結果
    */
-  increaseLovelity (id, incremental) {
-    return this._updateUser(id, 
+  increaseLovelity (user, incremental) {
+    return this._updateUser(user, 
       {$inc:{ 'lovelity': incremental}}
     )
   }
