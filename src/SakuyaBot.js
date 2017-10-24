@@ -3,10 +3,12 @@
 'use strict'
 
 const SakuyaBot = class {
-  constructor (client, db, logger) {
+  constructor (client, db, logger, rand) {
     this.client = client
     this.db = db
     this.logger = logger
+    this.rand = rand
+    
 
     this.teaSelector = require('./Teapot.js')
     

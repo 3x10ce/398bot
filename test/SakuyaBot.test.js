@@ -51,7 +51,12 @@ let client = {
   follow: (id) => id
 }
 
-let sakuyaBot = new SakuyaBot(client, db, logger)
+let rand = {
+  genInt: () => (0),
+  gen: () => (0.0)
+}
+
+let sakuyaBot = new SakuyaBot(client, db, logger, rand)
 sakuyaBot.teaSelector = () => ({name: '(紅茶名)', language_of: '(花言葉)', rarity: 1})
 /* SakuyaBot test*/
 
@@ -62,7 +67,7 @@ describe('口上反応テスト', () => {
   it('反応しない', () => {
     let tweet = createTweetMock()
 
-    tweet.text = 'ignored tweet'
+    tweet.text = '@398Bot ignored tweet'
     // ツイートを返さないことを期待
     let client_mock = sinon.mock(client)
     client_mock.expects('tweet').never()
