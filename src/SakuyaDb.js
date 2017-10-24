@@ -91,6 +91,30 @@ let SakuyaDb = class {
       {$inc:{ 'lovelity': incremental}}
     )
   }
+
+  /**
+   * 指定したIDのユーザの献血履歴を残します。
+   * @param {UserObject} user 
+   * @param {number} 献血量
+   * @return updateの結果
+   */
+  addDonateLog(user, amount) {
+    let collection = this.db.collection('donate')
+    return collection.insertOne({
+      'user_id': user.id_str,
+      'amount': amount
+    })
+  }
+
+  /**
+   * 指定したユーザが献血していたかどうかを調べます。
+   * @param {UserObject} user
+   * @return findの結果
+   */
+  userIsDonated(user) {
+    let collection = this.db.collection('donate')
+    return collection.findOne({ '_id': user.id_str})
+  }
 }
 
 module.exports = SakuyaDb
