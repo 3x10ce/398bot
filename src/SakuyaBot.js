@@ -75,6 +75,11 @@ const SakuyaBot = class {
         this.client.tweet(`あなたの誕生日は${m}月${d}日なのね。`, tweet.user)
         this.db.setBirthday(tweet.user, m, d)
       }
+    } else if (tweet.text.match(/献血/)) {
+      let donated = this.rand.genInt(200) + 200
+      this.db.addDonateLog(tweet.user, donated).then( () => {
+        this.client.tweet(`あなたの血を ${donated} mL頂いたわ。お嬢様もきっと喜ぶと思うわ。どうもありがとう。`)
+      })
     }
   }
 

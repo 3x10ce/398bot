@@ -23,7 +23,8 @@ let db = {
   getUser: (id) => ({then: () => sinon.stub().returns(createUserDataMock(id))}),
   setNickname: (id, nickname) => [id, nickname],
   setBirthday: (id, m, d) => [id, m, d],
-  increaseLovelity: (id, lovelity) => [id, lovelity]
+  increaseLovelity: (id, lovelity) => [id, lovelity],
+  addDonateLog: (name) => new Promise((r) => r(name))
 }
 // logのmock
 let logger = {
