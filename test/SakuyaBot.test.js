@@ -24,7 +24,7 @@ let db = {
   setNickname: (id, nickname) => [id, nickname],
   setBirthday: (id, m, d) => [id, m, d],
   increaseLovelity: (id, lovelity) => [id, lovelity],
-  addDonateLog: (name) => new Promise((r) => r(name))
+  addDonateLog: (name, amount) => ({ then: (r) => r(name, amount) })
 }
 // logのmock
 let logger = {
@@ -110,6 +110,20 @@ describe('口上反応テスト', () => {
     let client_mock = sinon.mock(client)
     client_mock.expects('tweet').once().withArgs(
       'あなたの誕生日は10月15日なのね。', tweet.user
+    )
+
+    sakuyaBot.read(tweet)
+
+    client_mock.verify()
+  })
+  it('献血', () => {
+    let tweet = createTweetMock()
+    tweet.text = '@398Bot 献血'
+
+    // テスト返信を期待
+    let client_mock = sinon.mock(client)
+    client_mock.expects('tweet').once().withArgs(
+      'あなたの血を 200 mL頂いたわ。お嬢様もきっと喜ぶと思うわ。どうもありがとう。', tweet.user
     )
 
     sakuyaBot.read(tweet)

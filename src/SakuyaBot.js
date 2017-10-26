@@ -78,7 +78,7 @@ const SakuyaBot = class {
     } else if (tweet.text.match(/献血/)) {
       let donated = this.rand.genInt(200) + 200
       this.db.addDonateLog(tweet.user, donated).then( () => {
-        this.client.tweet(`あなたの血を ${donated} mL頂いたわ。お嬢様もきっと喜ぶと思うわ。どうもありがとう。`)
+        this.client.tweet(`あなたの血を ${donated} mL頂いたわ。お嬢様もきっと喜ぶと思うわ。どうもありがとう。`, tweet.user)
       })
     }
   }
