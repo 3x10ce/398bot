@@ -115,6 +115,15 @@ let SakuyaDb = class {
     let collection = this.db.collection('donate')
     return collection.findOne({ '_id': user.id_str})
   }
+
+  /**
+   * 献血履歴テーブルをクリアします。
+   * @return delete結果
+   */
+  clearDonatedLog () {
+    let collection = this.db.collection('donate')
+    return collection.delete({})
+  }
 }
 
 module.exports = SakuyaDb
