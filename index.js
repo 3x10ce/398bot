@@ -6,8 +6,10 @@ let TwitterClient = require('./src/TwitterClient')
 let FollowCrawler = require('./src/FollowingCrawler')
 let MongoDb = require('mongodb').Db
 let MongoServer = require('mongodb').Server
+let Scheduler = require('node-schedule')
 
 let rand = require('./src/Randomizer')
+
 
 // 環境変数よみこみ
 require('dotenv').config()
@@ -36,6 +38,12 @@ let sdb = new SakuyaDb(db)
 
 let sakuyaBot = new SakuyaBot(client, sdb, logger, rand)
 sakuyaBot.start()
+Scheduler.scheduleJob({
+  hour: 0,
+  minute: 0
+}, () => {
+  sakuyaBot.daily_work(new Date())
+})
 
 let autoRemove = new FollowCrawler(client)
 autoRemove.start()

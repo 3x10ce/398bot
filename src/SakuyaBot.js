@@ -36,6 +36,16 @@ const SakuyaBot = class {
     })
   }
 
+  // 毎日 0時に実行する
+  daily_work (today) {
+    // 秒単位のずれで日付が前後することを防ぐため 12時間分加算する
+    today = new Date(today.getTime() + 43200)
+
+    let m = today.getMonth() + 1
+    let d = today.getDate()
+    this.client.tweet(`${m}月 ${d}日になったわね。`)
+  }
+
   read (tweet) {
     this.logger.info(`reading tweet @${tweet.user.screen_name}: ${tweet.text}`)
 
