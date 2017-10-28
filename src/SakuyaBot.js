@@ -60,37 +60,40 @@ const SakuyaBot = class {
     let userdata
     this.db.getUser(tweet.user.id).then( (user) => {
       userdata = user
-    })
-    if (userdata === null) {
-      this.db.createUser(tweet.user).then( (user) => {
-        userdata = user
-      })
-    }
 
-    // 返信する
-    if (tweet.text.match(/テスト/)) {
-      this.client.tweet('テスト返信', tweet.user)
-
-    } else if (tweet.text.match(/こんにちは/)) {
-      this.client.tweet(`${userdata.nickname}さん、こんにちは。`, tweet.user)
-
-    } else if (tweet.text.match(/紅茶/)) {
-      let tea = this.teaSelector()
-      this.client.tweet(`はい、${tea.name}を淹れてみましたわ。花言葉は${tea.language_of}ね。召し上がれ。`, tweet.user)
-
-    } else if (tweet.text.match(/誕生日/)) {
-      let [, m, d] = (tweet.text.match(/誕生日は([12][0-9])月([1-3][0-9])日/) || [] )
-
-      if( m !== undefined && d !== undefined) {
-        this.client.tweet(`あなたの誕生日は${m}月${d}日なのね。`, tweet.user)
-        this.db.setBirthday(tweet.user, m, d)
+      if (userdata === null) {
+        this.db.createUser(tweet.user).then( (user) => {
+          userdata = user
+        })
       }
-    } else if (tweet.text.match(/献血/)) {
-      let donated = this.rand.genInt(200) + 200
-      this.db.addDonateLog(tweet.user, donated).then( () => {
-        this.client.tweet(`あなたの血を ${donated} mL頂いたわ。お嬢様もきっと喜ぶと思うわ。どうもありがとう。`, tweet.user)
-      })
-    }
+    }).then( () => {
+
+      // 返信する
+      if (tweet.text.match(/テスト/)) {
+        this.client.tweet('テスト返信', tweet.user)
+
+      } else if (tweet.text.match(/こんにちは/)) {
+        this.client.tweet(`${userdata.nickname}さん、こんにちは。`, tweet.user)
+
+      } else if (tweet.text.match(/紅茶/)) {
+        let tea = this.teaSelector()
+        this.client.tweet(`はい、${tea.name}を淹れてみましたわ。花言葉は${tea.language_of}ね。召し上がれ。`, tweet.user)
+
+      } else if (tweet.text.match(/誕生日/)) {
+        let [, m, d] = (tweet.text.match(/誕生日は([12][0-9])月([1-3][0-9])日/) || [] )
+
+        if( m !== undefined && d !== undefined) {
+          this.client.tweet(`あなたの誕生日は${m}月${d}日なのね。`, tweet.user)
+          this.db.setBirthday(tweet.user, m, d)
+        }
+      } else if (tweet.text.match(/献血/)) {
+        let donated = this.rand.genInt(200) + 200
+        this.db.addDonateLog(tweet.user, donated).then( () => {
+          this.client.tweet(`あなたの血を ${donated} mL頂いたわ。お嬢様もきっと喜ぶと思うわ。どうもありがとう。`, tweet.user)
+        })
+      }
+
+    }).catch((err) => console.error(err))
   }
 
   receive (event) {

@@ -1,5 +1,7 @@
 /* eslint-disable no-undef */
 let sinon = require('sinon')
+let sinonStubPromise = require('sinon-stub-promise')
+
 let SakuyaBot = require('../src/SakuyaBot')
 
 // 適当なtweetのmockを作成する
@@ -20,7 +22,11 @@ let createUserDataMock = () => ({
 // dbのmock/stub
 let db = {
   createUser: (user) => user,
-  getUser: (id) => ({then: () => sinon.stub().returns(createUserDataMock(id))}),
+  getUser: (id) => {
+    return new Promise((resolve) => {
+      resolve(createUserDataMock(id))
+    })
+  },
   setNickname: (id, nickname) => [id, nickname],
   setBirthday: (id, m, d) => [id, m, d],
   increaseLovelity: (id, lovelity) => [id, lovelity],
@@ -193,6 +199,34 @@ describe('口上反応テスト', () => {
     client_mock.verify()
   })
 })
+
+describe('日付変更時ついーと', () => {
+  it('日付変更', () => {
+
+    // 日付変更ツイートを期待
+    let client_mock = sinon.mock(client)
+    client_mock.expects('tweet').once().withArgs(
+      '7月 15日になったわね。'
+    )
+
+    sakuyaBot.daily_work(new Date(2017, 6, 15, 0, 0, 0, 0))
+
+    client_mock.verify()
+  })
+  it('イベント発生がちょっとずれた', () => {
+
+    // 日付変更ツイートを期待
+    let client_mock = sinon.mock(client)
+    client_mock.expects('tweet').once().withArgs(
+      '7月 15日になったわね。'
+    )
+
+    sakuyaBot.daily_work(new Date(2017, 6, 14, 23, 59, 55, 0))
+
+    client_mock.verify()
+  })
+})
+
 
 describe('フォローチェックテスト', () => {
   beforeEach( () => {
