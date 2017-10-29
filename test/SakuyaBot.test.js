@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 let sinon = require('sinon')
 let sinonStubPromise = require('sinon-stub-promise')
+sinonStubPromise(sinon)
 
 let SakuyaBot = require('../src/SakuyaBot')
 
@@ -12,6 +13,8 @@ let createTweetMock = () => ({
   user: createUserMock()
 })
 
+let mockPromise = (value) => new Promise((r) => r(value))
+
 // 適当なuser data を生成する
 let createUserDataMock = () => ({
   _id: '0',
@@ -22,15 +25,11 @@ let createUserDataMock = () => ({
 // dbのmock/stub
 let db = {
   createUser: (user) => user,
-  getUser: (id) => {
-    return new Promise((resolve) => {
-      resolve(createUserDataMock(id))
-    })
-  },
-  setNickname: (id, nickname) => [id, nickname],
-  setBirthday: (id, m, d) => [id, m, d],
-  increaseLovelity: (id, lovelity) => [id, lovelity],
-  addDonateLog: (name, amount) => ({ then: (r) => r(name, amount) })
+  getUser: (id) => mockPromise(createUserDataMock(id)),
+  setNickname: (id, nickname) => mockPromise([id, nickname]),
+  setBirthday: (id, m, d) => mockPromise([id, m, d]),
+  increaseLovelity: (id, lovelity) => mockPromise([id, lovelity]),
+  addDonateLog: (name, amount) => mockPromise(name, amount)
 }
 // logのmock
 let logger = {
@@ -52,9 +51,8 @@ let createUserMock = () => ({
 
 // clientのmock
 let client = {
-  verifyCredentials: () => 
-    new Promise((r) => {r({id_str:'0000', name: 'SakuyaTest', screen_name: '398Bot'})}),
-  tweet: (text) => text,
+  verifyCredentials: () => mockPromise({id_str:'0000', name: 'SakuyaTest', screen_name: '398Bot'}),
+  tweet: (text) => mockPromise(text),
   follow: (id) => id
 }
 
@@ -68,85 +66,72 @@ sakuyaBot.teaSelector = () => ({name: '(紅茶名)', language_of: '(花言葉)',
 /* SakuyaBot test*/
 
 describe('口上反応テスト', () => {
-  afterEach( () => {
-
+  let client_mock
+  beforeEach( () => {
+    client_mock = sinon.mock(client, 'tweet', () => new Promise())
   })
+  afterEach( () => {
+    client_mock.restore()
+  })
+
   it('反応しない', () => {
     let tweet = createTweetMock()
 
     tweet.text = '@398Bot ignored tweet'
     // ツイートを返さないことを期待
-    let client_mock = sinon.mock(client)
     client_mock.expects('tweet').never()
-    sakuyaBot.read(tweet)
 
-    client_mock.verify()
-    
+    sakuyaBot.read(tweet).then(() => client_mock.verify() )
   })
   it('テスト口上', () => {
     let tweet = createTweetMock()
     tweet.text = '@398Bot テスト'
     // テスト返信を期待
-    let client_mock = sinon.mock(client)
     client_mock.expects('tweet').once().withArgs('テスト返信', tweet.user)
     
-    sakuyaBot.read(tweet)
-
-    client_mock.verify()
+    sakuyaBot.read(tweet).then(() => client_mock.verify() )
   })
   it('紅茶を入れる', () => {
     let tweet = createTweetMock()
     tweet.text = '@398Bot 紅茶'
 
     // テスト返信を期待
-    let client_mock = sinon.mock(client)
     client_mock.expects('tweet').once().withArgs(
       'はい、(紅茶名)を淹れてみましたわ。花言葉は(花言葉)ね。召し上がれ。', tweet.user
     )
 
-    sakuyaBot.read(tweet)
-
-    client_mock.verify()
+    sakuyaBot.read(tweet).then(() => client_mock.verify() )
   })
   it('誕生日', () => {
     let tweet = createTweetMock()
     tweet.text = '@398Bot 誕生日は10月15日'
 
     // テスト返信を期待
-    let client_mock = sinon.mock(client)
     client_mock.expects('tweet').once().withArgs(
       'あなたの誕生日は10月15日なのね。', tweet.user
     )
 
-    sakuyaBot.read(tweet)
-
-    client_mock.verify()
+    sakuyaBot.read(tweet).then(() => client_mock.verify() )
   })
   it('献血', () => {
     let tweet = createTweetMock()
     tweet.text = '@398Bot 献血'
 
     // テスト返信を期待
-    let client_mock = sinon.mock(client)
     client_mock.expects('tweet').once().withArgs(
       'あなたの血を 200 mL頂いたわ。お嬢様もきっと喜ぶと思うわ。どうもありがとう。', tweet.user
     )
 
-    sakuyaBot.read(tweet)
-
-    client_mock.verify()
+    sakuyaBot.read(tweet).then(() => client_mock.verify() )
   })
   it('リプライでないツイートには反応しない', () => {
     let tweet = createTweetMock()
     tweet.text = 'テスト'
 
     // テスト返信しないことを期待
-    let client_mock = sinon.mock(client)
     client_mock.expects('tweet').never()
 
-    sakuyaBot.read(tweet)
-
-    client_mock.verify()
+    sakuyaBot.read(tweet).then(() => client_mock.verify() )
 
   })
   it('他の人あてのリプライには反応しない', () => {
@@ -154,12 +139,9 @@ describe('口上反応テスト', () => {
     tweet.text = '@3x10ce テスト'
 
     // テスト返信しないことを期待
-    let client_mock = sinon.mock(client)
     client_mock.expects('tweet').never()
 
-    sakuyaBot.read(tweet)
-
-    client_mock.verify()
+    sakuyaBot.read(tweet).then(() => client_mock.verify() )
 
   })
   it('自分以外へのリプライが混ざっている場合は反応しない', () => {
@@ -167,36 +149,27 @@ describe('口上反応テスト', () => {
     tweet.text = '@398Bot @3x10ce テスト'
 
     // テスト返信しないことを期待
-    let client_mock = sinon.mock(client)
     client_mock.expects('tweet').never()
 
-    sakuyaBot.read(tweet)
-
-    client_mock.verify()
+    sakuyaBot.read(tweet).then(() => client_mock.verify() )
   })
   it('自分以外へのリプライが混ざっている場合は反応しない', () => {
     let tweet = createTweetMock()
     tweet.text = '@398Bot @3x10ce テスト'
 
     // テスト返信しないことを期待
-    let client_mock = sinon.mock(client)
     client_mock.expects('tweet').never()
 
-    sakuyaBot.read(tweet)
-
-    client_mock.verify()
+    sakuyaBot.read(tweet).then(() => client_mock.verify() )
   })
   it('ツイート途中に自分の@が混ざっている場合は反応しない', () => {
     let tweet = createTweetMock()
     tweet.text = 'これは @398Bot テスト'
 
     // テスト返信しないことを期待
-    let client_mock = sinon.mock(client)
     client_mock.expects('tweet').never()
 
-    sakuyaBot.read(tweet)
-
-    client_mock.verify()
+    sakuyaBot.read(tweet).then(() => client_mock.verify() )
   })
 })
 
