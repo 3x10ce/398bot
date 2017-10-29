@@ -1,7 +1,5 @@
 /* eslint-disable no-undef */
 let sinon = require('sinon')
-let sinonStubPromise = require('sinon-stub-promise')
-sinonStubPromise(sinon)
 
 let SakuyaBot = require('../src/SakuyaBot')
 
