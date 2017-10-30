@@ -65,8 +65,8 @@ const SakuyaBot = class {
       
         return new Promise((resolve) => {
           if (user === null) {
-            return this.db.createUser(tweet.user).then( (user) => {
-              resolve(user)
+            return this.db.createUser(tweet.user).then( (result) => {
+              resolve(result.ops[0])
             })
           } else {
             resolve(user)
