@@ -57,3 +57,5 @@ typings/
 # dotenv environment variables file
 .env
 
+# 仕様元にしているソースコード
+oldsource/
