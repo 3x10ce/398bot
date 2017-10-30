@@ -117,6 +117,19 @@ let SakuyaDb = class {
   }
 
   /**
+   * 献血履歴テーブルから合計量を集計します。
+   * @return {number} 献血量
+   */
+  sumDonation () {
+    let collection = this.db.collection('donate')
+    return collection.find({}).then((r) => {
+      return new Promise((resolve) => {
+        resolve(r.reduce((p,c) => p + c.amount, 0))
+      })
+    })
+  }
+
+  /**
    * 献血履歴テーブルをクリアします。
    * @return delete結果
    */
