@@ -35,10 +35,16 @@ const TwitterClient = class {
    * @param {TweetObject} reply_to (optional) 返信先のツイート
    * @return {Promise} 結果をresolve/rejectするPromiseオブジェクト */
   tweet (text, reply_to) {
-    let params = { status: text }
+    let params
+
+    // reply_toがある場合は対象ツイートへのリプライを投げる
     if (reply_to) {
-      params.text = '@' + reply_to.user.screen_name + ' ' + params.text
-      params.in_reply_to_status_id = reply_to.id_str
+      params = {
+        status: '@' + reply_to.user.screen_name + ' ' + text,
+        in_reply_to_status_id: reply_to.id_str
+      }
+    } else {
+      params = { status: text }
     }
     return this.twitter.post('statuses/update', params)
   }
