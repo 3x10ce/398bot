@@ -99,6 +99,7 @@ let SakuyaDb = class {
    * @return updateの結果
    */
   addDonateLog(user, amount) {
+    console.dir(user)
     let collection = this.db.collection('donate')
     return collection.insertOne({
       'user_id': user.id_str,
@@ -130,12 +131,22 @@ let SakuyaDb = class {
   }
 
   /**
+   * 合計献血量を日別献血履歴に退避し、
    * 献血履歴テーブルをクリアします。
    * @return delete結果
    */
-  clearDonatedLog () {
-    let collection = this.db.collection('donate')
-    return collection.delete({})
+  stashDonatedLog () {
+    let donate = this.db.collection('donate')
+    let history = this.db.collection('history')
+
+    return this.sumDonation().then((amount) => {
+      return history.insertOne({
+        '_id': new Date().toISOString().split('T')[0],
+        'amount': amount
+      })
+    }).then(() => {
+      return donate.delete({})
+    })
   }
 }
 
