@@ -291,12 +291,3 @@ let randomChoice = (user) => {
   x = y; y = z; z = w
   return (w ^ (w >>> 19)) ^ (t ^ (t >>> 8))
 }
-
-console.log(module.exports({id_str: "62886137"}))
-console.log(module.exports({id_str: "62886137"}))
-console.log(module.exports({id_str: "62886137"}))
-console.log(module.exports({id_str: "62886137"}))
-console.log(module.exports({id_str: "62886137"}))
-console.log(module.exports({id_str: "62886137"}))
-console.log(module.exports({id_str: "62886137"}))
-console.log(module.exports({id_str: "62886137"}))
