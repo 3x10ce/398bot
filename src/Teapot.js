@@ -272,7 +272,6 @@ let teaList = [
 
 module.exports = function selectTea(user) {
   let choice = Math.abs(randomChoice(user)) % teaList.length 
-  console.log(choice)
   return teaList[choice]
 }
 
@@ -284,7 +283,7 @@ let randomChoice = (user) => {
   let x = 163981341
   let y = 398398398
   let z = 134134116  
-  let w = user.id_str.substr(-9) * 1 ^ ( new Date().getTime()/86400|0)
+  let w = user.id_str.substr(-9) * 1 ^ ( new Date().getTime()/86400000|0)
   let t
 
   // XorShift
@@ -292,3 +291,12 @@ let randomChoice = (user) => {
   x = y; y = z; z = w
   return (w ^ (w >>> 19)) ^ (t ^ (t >>> 8))
 }
+
+console.log(module.exports({id_str: "62886137"}))
+console.log(module.exports({id_str: "62886137"}))
+console.log(module.exports({id_str: "62886137"}))
+console.log(module.exports({id_str: "62886137"}))
+console.log(module.exports({id_str: "62886137"}))
+console.log(module.exports({id_str: "62886137"}))
+console.log(module.exports({id_str: "62886137"}))
+console.log(module.exports({id_str: "62886137"}))
