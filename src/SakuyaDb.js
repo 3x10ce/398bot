@@ -148,7 +148,7 @@ let SakuyaDb = class {
    */
   stashDonatedLog () {
     let donate = this.db.collection('donate')
-    let history = this.db.collection('history')
+    let history = this.db.collection('donateHistory')
 
     return this.sumDonation().then((amount) => {
       return history.insertOne({
@@ -156,7 +156,7 @@ let SakuyaDb = class {
         'amount': amount
       })
     }).then(() => {
-      return donate.delete({})
+      return donate.remove({})
     })
   }
 }
