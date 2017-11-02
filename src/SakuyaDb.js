@@ -37,7 +37,12 @@ let SakuyaDb = class {
    */
   getUser (user) {
     let collection = this.db.collection('users')
-    return collection.findOne({ '_id': user.id_str})
+    return new Promise((resolve, reject) => {
+      collection.findOne({ '_id': user.id_str}).toArray((err, data) => {
+        if (err) reject(err)
+        else resolve(data)
+      })
+    })
   }
 
   /**
@@ -114,7 +119,12 @@ let SakuyaDb = class {
    */
   userIsDonated(user) {
     let collection = this.db.collection('donate')
-    return collection.findOne({ '_id': user.id_str})
+    return new Promise((resolve,reject) => {
+      collection.findOne({ '_id': user.id_str}).toArray((err, data) => {
+        if (err) reject(err)
+        else resolve(data)
+      })
+    })
   }
 
   /**
@@ -123,9 +133,10 @@ let SakuyaDb = class {
    */
   sumDonation () {
     let collection = this.db.collection('donate')
-    return collection.find({}).then((r) => {
-      return new Promise((resolve) => {
-        resolve(r.reduce((p,c) => p + c.amount, 0))
+    return new Promise((resolve, reject) => {
+      collection.find({}).toArray((err, data) => {
+        if (err) reject(err)
+        else resolve(data.reduce((p,c) => p + c.amount, 0))
       })
     })
   }
