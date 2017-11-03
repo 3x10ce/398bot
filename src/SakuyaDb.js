@@ -37,12 +37,7 @@ let SakuyaDb = class {
    */
   getUser (user) {
     let collection = this.db.collection('users')
-    return new Promise((resolve, reject) => {
-      collection.findOne({ '_id': user.id_str}).toArray((err, data) => {
-        if (err) reject(err)
-        else resolve(data)
-      })
-    })
+    return collection.findOne({ '_id': user.id_str})
   }
 
   /**
