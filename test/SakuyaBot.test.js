@@ -11,7 +11,7 @@ let createTweetMock = () => ({
   user: createUserMock()
 })
 
-let mockPromise = (value) => new Promise((r) => r(value))
+let mockPromise = (value) => Promise.resolve(value)
 
 // 適当なuser data を生成する
 let createUserDataMock = () => ({
@@ -66,7 +66,7 @@ sakuyaBot.teaSelector = () => ({name: '(紅茶名)', language_of: '(花言葉)',
 describe('口上反応テスト', () => {
   let client_mock
   beforeEach( () => {
-    client_mock = sinon.mock(client, 'tweet', () => new Promise())
+    client_mock = sinon.mock(client, 'tweet', (tweet, user) => Promise.resolve([tweet, user]))
   })
   afterEach( () => {
     client_mock.restore()
@@ -79,15 +79,19 @@ describe('口上反応テスト', () => {
     // ツイートを返さないことを期待
     client_mock.expects('tweet').never()
 
-    sakuyaBot.read(tweet).then(() => client_mock.verify() )
+    sakuyaBot.read(tweet)
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
   })
   it('テスト口上', () => {
     let tweet = createTweetMock()
     tweet.text = '@398Bot テスト'
     // テスト返信を期待
-    client_mock.expects('tweet').once().withArgs('テスト返信', tweet.user)
+    client_mock.expects('tweet').once().withArgs('テスト返信', tweet)
     
-    sakuyaBot.read(tweet).then(() => client_mock.verify() )
+    sakuyaBot.read(tweet)
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
   })
   it('紅茶を入れる', () => {
     let tweet = createTweetMock()
@@ -95,10 +99,12 @@ describe('口上反応テスト', () => {
 
     // テスト返信を期待
     client_mock.expects('tweet').once().withArgs(
-      'はい、(紅茶名)を淹れてみましたわ。花言葉は(花言葉)ね。召し上がれ。', tweet.user
+      'はい、(紅茶名)を淹れてみましたわ。花言葉は(花言葉)ね。召し上がれ。', tweet
     )
 
-    sakuyaBot.read(tweet).then(() => client_mock.verify() )
+    sakuyaBot.read(tweet)
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
   })
   it('誕生日', () => {
     let tweet = createTweetMock()
@@ -106,10 +112,12 @@ describe('口上反応テスト', () => {
 
     // テスト返信を期待
     client_mock.expects('tweet').once().withArgs(
-      'あなたの誕生日は10月15日なのね。', tweet.user
+      'あなたの誕生日は10月15日なのね。', tweet
     )
 
-    sakuyaBot.read(tweet).then(() => client_mock.verify() )
+    sakuyaBot.read(tweet)
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
   })
   it('献血', () => {
     let tweet = createTweetMock()
@@ -117,10 +125,12 @@ describe('口上反応テスト', () => {
 
     // テスト返信を期待
     client_mock.expects('tweet').once().withArgs(
-      'あなたの血を 200 mL頂いたわ。お嬢様もきっと喜ぶと思うわ。どうもありがとう。', tweet.user
+      'あなたの血を 200 mL頂いたわ。お嬢様もきっと喜ぶと思うわ。どうもありがとう。', tweet
     )
 
-    sakuyaBot.read(tweet).then(() => client_mock.verify() )
+    sakuyaBot.read(tweet)
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
   })
   it('リプライでないツイートには反応しない', () => {
     let tweet = createTweetMock()
@@ -129,7 +139,9 @@ describe('口上反応テスト', () => {
     // テスト返信しないことを期待
     client_mock.expects('tweet').never()
 
-    sakuyaBot.read(tweet).then(() => client_mock.verify() )
+    sakuyaBot.read(tweet)
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
 
   })
   it('他の人あてのリプライには反応しない', () => {
@@ -139,7 +151,9 @@ describe('口上反応テスト', () => {
     // テスト返信しないことを期待
     client_mock.expects('tweet').never()
 
-    sakuyaBot.read(tweet).then(() => client_mock.verify() )
+    sakuyaBot.read(tweet)
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
 
   })
   it('自分以外へのリプライが混ざっている場合は反応しない', () => {
@@ -149,7 +163,9 @@ describe('口上反応テスト', () => {
     // テスト返信しないことを期待
     client_mock.expects('tweet').never()
 
-    sakuyaBot.read(tweet).then(() => client_mock.verify() )
+    sakuyaBot.read(tweet)
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
   })
   it('自分以外へのリプライが混ざっている場合は反応しない', () => {
     let tweet = createTweetMock()
@@ -158,7 +174,9 @@ describe('口上反応テスト', () => {
     // テスト返信しないことを期待
     client_mock.expects('tweet').never()
 
-    sakuyaBot.read(tweet).then(() => client_mock.verify() )
+    sakuyaBot.read(tweet)
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
   })
   it('ツイート途中に自分の@が混ざっている場合は反応しない', () => {
     let tweet = createTweetMock()
@@ -167,7 +185,9 @@ describe('口上反応テスト', () => {
     // テスト返信しないことを期待
     client_mock.expects('tweet').never()
 
-    sakuyaBot.read(tweet).then(() => client_mock.verify() )
+    sakuyaBot.read(tweet)
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
   })
 })
 
@@ -244,7 +264,7 @@ describe('フォローチェックテスト', () => {
       event: 'follow',
       target: createUserMock()
     }
-    // F/F比10%
+    // F/F比0%
     event.target.followers_count = 0
     event.target.friends_count = 1
 
