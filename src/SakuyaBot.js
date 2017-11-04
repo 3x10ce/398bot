@@ -54,7 +54,7 @@ const SakuyaBot = class {
   }
 
   read (tweet) {
-    this.logger.info(`reading tweet @${tweet.user.screen_name}: ${tweet.text}`)
+    this.logger.info(`[${tweet.id_str}] @${tweet.user.screen_name}: ${tweet.text}`)
     return new Promise((resolve,reject) => {
 
       // 自身以外へのrepliesを除外する
@@ -89,7 +89,7 @@ const SakuyaBot = class {
         .replace('[a-z]+://', '[url]')
       // 返信する
       if (tweet.text.match(/こんにちは/)) {
-        return this.client.tweet(`${callAs}さん、こんにちは。`, tweet)
+        return this.client.tweet(`${callAs}、こんにちは。`, tweet)
 
       } else if (tweet.text.match(/紅茶/)) {
         let tea = this.teaSelector(tweet.user)
@@ -112,12 +112,12 @@ const SakuyaBot = class {
           })
       }
       
-      Promise.resolve(null)
+      return Promise.resolve(null)
     }).then((result) => {
       
       // 何か応答を行なった場合はログに残す
-      if (result !== null) return
-      // this.logger.debug(`response: `)
+      if (result === null) return
+      this.logger.debug(`[${result.id_str}]response: ${result.text}`)
       console.log(result)
 
     }).catch((err) => {
