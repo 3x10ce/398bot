@@ -79,13 +79,20 @@ const SakuyaBot = class {
     }).then( (userdata) => {
       // createしていた場合は初期値のuser情報を設定
       if( userdata.ops !== undefined) userdata = userdata.ops[0]
-        
+      
+      // 呼び名設定
+      //  :NAME: -> ユーザの名前(@以降を含めず)
+      //  :NAME_ORG: -> ユーザの名前(@以降を含める)
+      let callAs = userdata.nickname
+        .replace(':NAME:', tweet.user.name.split(/[@＠]/))
+        .replace(':NAME_ORG:', tweet.user.name.replace(/[@＠]/, ' at '))
+        .replace('[a-z]+://', '[url]')
       // 返信する
       if (tweet.text.match(/テスト/)) {
         return this.client.tweet('テスト返信', tweet)
 
       } else if (tweet.text.match(/こんにちは/)) {
-        return this.client.tweet(`${userdata.nickname}さん、こんにちは。`, tweet)
+        return this.client.tweet(`${callAs}さん、こんにちは。`, tweet)
 
       } else if (tweet.text.match(/紅茶/)) {
         let tea = this.teaSelector(tweet.user)
