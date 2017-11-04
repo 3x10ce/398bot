@@ -17,7 +17,7 @@ let mockPromise = (value) => Promise.resolve(value)
 let createUserDataMock = () => ({
   _id: '0',
   name: 'Masashi',
-  nickname: 'Massie',
+  nickname: ':NAME:さん',
   lovelity: 20
 })
 // dbのmock/stub
@@ -81,16 +81,6 @@ describe('口上反応テスト', () => {
     // ツイートを返さないことを期待
     client_mock.expects('tweet').never()
 
-    sakuyaBot.read(tweet)
-      .then(() => client_mock.verify())
-      .catch((err) => { throw err })
-  })
-  it('テスト口上', () => {
-    let tweet = createTweetMock()
-    tweet.text = '@398Bot テスト'
-    // テスト返信を期待
-    client_mock.expects('tweet').once().withArgs('テスト返信', tweet)
-    
     sakuyaBot.read(tweet)
       .then(() => client_mock.verify())
       .catch((err) => { throw err })

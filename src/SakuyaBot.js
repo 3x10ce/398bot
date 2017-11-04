@@ -88,10 +88,7 @@ const SakuyaBot = class {
         .replace(':NAME_ORG:', tweet.user.name.replace(/[@＠]/, ' at '))
         .replace('[a-z]+://', '[url]')
       // 返信する
-      if (tweet.text.match(/テスト/)) {
-        return this.client.tweet('テスト返信', tweet)
-
-      } else if (tweet.text.match(/こんにちは/)) {
+      if (tweet.text.match(/こんにちは/)) {
         return this.client.tweet(`${callAs}さん、こんにちは。`, tweet)
 
       } else if (tweet.text.match(/紅茶/)) {
