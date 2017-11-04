@@ -43,7 +43,14 @@ const SakuyaBot = class {
 
     let m = today.getMonth() + 1
     let d = today.getDate()
-    this.client.tweet(`${m}月 ${d}日になったわね。`)
+    return this.db.sumDonation().then( (amount) => {
+      return this.client.tweet(`${m}月 ${d}日になったわね。 先日は ${amount} ml の献血をいただきましたわ。`)      
+    }).then(() => {
+      return this.db.stashDonatedLog()
+    }).catch((err) => {
+      this.logger.error(err)
+      this.logger.trace(err.trace)
+    })
   }
 
   read (tweet) {

@@ -27,7 +27,9 @@ let db = {
   setNickname: (id, nickname) => mockPromise([id, nickname]),
   setBirthday: (id, m, d) => mockPromise([id, m, d]),
   increaseLovelity: (id, lovelity) => mockPromise([id, lovelity]),
-  addDonateLog: (name, amount) => mockPromise(name, amount)
+  addDonateLog: (name, amount) => mockPromise(name, amount),
+  sumDonation: () => mockPromise(1000),
+  stashDonation: () => mockPromise()
 }
 // logのmock
 let logger = {
@@ -197,24 +199,24 @@ describe('日付変更時ついーと', () => {
     // 日付変更ツイートを期待
     let client_mock = sinon.mock(client)
     client_mock.expects('tweet').once().withArgs(
-      '7月 15日になったわね。'
+      '7月 15日になったわね。 先日は 1000 ml の献血をいただきましたわ。'
     )
 
     sakuyaBot.daily_work(new Date(2017, 6, 15, 0, 0, 0, 0))
-
-    client_mock.verify()
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
   })
   it('イベント発生がちょっとずれた', () => {
 
     // 日付変更ツイートを期待
     let client_mock = sinon.mock(client)
     client_mock.expects('tweet').once().withArgs(
-      '7月 15日になったわね。'
+      '7月 15日になったわね。 先日は 1000 ml の献血をいただきましたわ。'
     )
 
     sakuyaBot.daily_work(new Date(2017, 6, 14, 23, 59, 55, 0))
-
-    client_mock.verify()
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
   })
 })
 
