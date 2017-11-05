@@ -131,13 +131,17 @@ const SakuyaBot = class {
     
 
   receive (event) {
-    this.logger.info(`received event @${event.target.screen_name}: ${event.event}.`)
+    // 自身で発生したイベントは無視する
+    if (event.source.screen_name === this.screen_name) return
+    this.logger.info(`received event @${event.source.screen_name}: ${event.event}.`)
 
     // フォローイベント
     if (event.event === 'follow') {
       // Follower数がFollow数の15%以上であればフォローする
-      if (event.target.friends_count * 0.15 < event.target.followers_count) {
-        this.client.follow(event.target.id_str)
+      if (event.source.friends_count * 0.15 < event.source.followers_count) {
+        this.client.follow(event.source.id_str).then(() => {
+          this.logger.info(`re-follow: @${event.source.screen_name}`)
+        })
       }
     }
   }
