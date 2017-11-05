@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>SakuyaBot</title>
+
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+  <style type="text/css">
+  header {
+    margin-bottom: 3em;
+  }
+  </style>
+
+  <!--[if lt IE 9]>
+    <script src="//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+
+</head>
+<body>
+
+<header>
+  <div class="navbar navbar-default navbar-fixed-top">
+
+    <div class="container">
+      <div class="navbar-header">
+        <a href="/" class="navbar-brand">SakuyaBot</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="bs-component">
+    <div class="jumbotron">
+      <h1>SakuyaBot</h1>
+      <p class="lead">
+        東方Projectのキャラクター「十六夜咲夜」のツイッターbotです。
+      </p>
+    </div>
+  </div>
+
+  <div class="panel panel-danger">
+    <div class="panel-heading">
+      <h3 class="panel-title">このbotはベータ版です！</h3>
+    </div>
+    <div class="panel-body">
+      botは現在ベータ版として、<a href="https://twitter.com/398Bot">@398Bot</a>にて試験的に稼働させています。 <strong>予期せぬ不具合が含まれている可能性が非常に高い</strong>ため、ご理解の上フォローをお願いいたします。
+    </div>
+  </div>
+
+  <div class="bs-docs-section">
+    <div class="page-header">
+      <h1>できること</h1>
+    </div>
+    <div class="bs-component">
+      <h3>自動リフォロー</h3>
+      <p>
+        botをフォローをすると自動でフォローした人をリフォロー（フォロー返し）を行います。（フォロワー稼ぎ目的のアカウント対策のため、リフォローには一定の条件があります。）
+      </p>
+    </div>
+    <div class="bs-component">
+      <h3>自動アンフォロー</h3>
+      <p>
+        botのフォローを解除すると自動でbotからのフォローも解除します。
+      </p>
+    </div>
+
+    <div class="bs-component">
+      <h3>紅茶</h3>
+      <p>
+        「紅茶」とリプライを送ると今日の紅茶を提供します。咲夜さんのチョイスは変わっているので、ちょっと変わったお茶も出るかも知れません。
+      </p>
+    </div>
+
+    <div class="bs-component">
+      <h3>献血</h3>
+      <p>
+        「献血」とリプライを送ると、咲夜さんが仕える吸血鬼のお嬢様方のごはんとなる血を捧げることができます。
+      </p>
+    </div>
+  </div>
+
+  <div class="bs-docs-section">
+    <div class="page-header">
+      <h1>こまったときは</h1>
+    </div>
+    <div class="bs-component">
+      サポートアカウント(<a href="https://twitter.com/SakuyaBot_Info">@SakuyaBot_Info</a>)までリプライをお願いします。
+    </div>
+  </div>
+</div>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+  $('.bs-component [data-toggle="popover"]').popover();
+  $('.bs-component [data-toggle="tooltip"]').tooltip();
+</script>
+
+</body>
+</html>
