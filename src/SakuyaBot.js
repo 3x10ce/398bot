@@ -139,11 +139,15 @@ const SakuyaBot = class {
     if (event.event === 'follow') {
       // Follower数がFollow数の15%以上であればフォローする
       if (event.source.friends_count * 0.15 < event.source.followers_count) {
-        this.client.follow(event.source.id_str).then(() => {
+        console.dir(this.client.follow(event.source.id_str))
+        return this.client.follow(event.source.id_str).then((result) => {
           this.logger.info(`re-follow: @${event.source.screen_name}`)
+
+          return Promise.resolve(result)
         })
       }
     }
+    return Promise.resolve(null)
   }
 }
 

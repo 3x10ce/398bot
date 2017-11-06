@@ -1,5 +1,7 @@
 /* eslint-disable no-undef */
 let sinon = require('sinon')
+//let sinonStubPromise = require('sinon-stub-promise')
+//sinonStubPromise(sinon)
 
 let SakuyaBot = require('../src/SakuyaBot')
 
@@ -53,7 +55,7 @@ let createUserMock = () => ({
 let client = {
   verifyCredentials: () => mockPromise({id_str:'0000', name: 'SakuyaTest', screen_name: '398Bot'}),
   tweet: (text) => mockPromise(text),
-  follow: (id) => id
+  follow: (id) => mockPromise(id)
 }
 
 let rand = {
@@ -184,10 +186,18 @@ describe('口上反応テスト', () => {
 })
 
 describe('日付変更時ついーと', () => {
+
+  let client_mock
+  beforeEach( () => {
+    client_mock = sinon.mock(client)
+  })
+  afterEach( () => {
+    client_mock.restore()
+  })
+
   it('日付変更', () => {
 
     // 日付変更ツイートを期待
-    let client_mock = sinon.mock(client)
     client_mock.expects('tweet').once().withArgs(
       '7月 15日になったわね。 先日は 1000 ml の献血をいただきましたわ。'
     )
@@ -199,7 +209,6 @@ describe('日付変更時ついーと', () => {
   it('イベント発生がちょっとずれた', () => {
 
     // 日付変更ツイートを期待
-    let client_mock = sinon.mock(client)
     client_mock.expects('tweet').once().withArgs(
       '7月 15日になったわね。 先日は 1000 ml の献血をいただきましたわ。'
     )
@@ -212,60 +221,65 @@ describe('日付変更時ついーと', () => {
 
 
 describe('フォローチェックテスト', () => {
+  let client_mock
   beforeEach( () => {
-    sakuyaBot = new SakuyaBot(client, db, logger)
+    client_mock = sinon.mock(client, 'follow', (id) => mockPromise(id))
   })
+  afterEach( () => {
+    client_mock.restore()
+  })
+
   it('通常のフォロー返しフロー', () => {
     let event = {
       event: 'follow',
-      target: createUserMock()
+      target: createUserMock(),
+      source: createUserMock()
     }
     // F/F比100%
-    event.target.followers_count = 100
-    event.target.friends_count = 100
+    event.source.followers_count = 100
+    event.source.friends_count = 100
 
     // フォローを返すことを期待
-    let client_mock = sinon.mock(client)
-    client_mock.expects('follow').once().withArgs('0')
+    client_mock.expects('follow').once()
 
     sakuyaBot.receive(event)
-
-    client_mock.verify()
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
   })
 
   it('スパムのフォロー返しフロー', () => {
     let event = {
       event: 'follow',
-      target: createUserMock()
+      target: createUserMock(),
+      source: createUserMock()
     }
     // F/F比10%
-    event.target.followers_count = 10
-    event.target.friends_count = 100
+    event.source.followers_count = 10
+    event.source.friends_count = 100
 
     // フォローを返さないことを期待
-    let client_mock = sinon.mock(client)
     client_mock.expects('follow').never()
 
     sakuyaBot.receive(event)
-
-    client_mock.verify()
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
   })
 
   it('作成直後のアカウント(フォロワー0人', () => {
     let event = {
       event: 'follow',
-      target: createUserMock()
+      target: createUserMock(),
+      source: createUserMock()
     }
     // F/F比0%
-    event.target.followers_count = 0
-    event.target.friends_count = 1
+    event.source.followers_count = 0
+    event.source.friends_count = 1
 
     // フォローを返さないことを期待
-    let client_mock = sinon.mock(client)
     client_mock.expects('follow').never()
 
     sakuyaBot.receive(event)
-
-    client_mock.verify()
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
   })
 })
