@@ -30,6 +30,7 @@ let db = {
   setBirthday: (id, m, d) => mockPromise([id, m, d]),
   increaseLovelity: (id, lovelity) => mockPromise([id, lovelity]),
   addDonateLog: (name, amount) => mockPromise(name, amount),
+  userIsDonated: () => mockPromise(false),
   sumDonation: () => mockPromise(1000),
   stashDonation: () => mockPromise()
 }
@@ -126,6 +127,23 @@ describe('口上反応テスト', () => {
       .then(() => client_mock.verify())
       .catch((err) => { throw err })
   })
+
+  it('すでに献血済み', () => {
+    let tweet = createTweetMock()
+    let db_stub = sinon.stub(db, 'userIsDonated')
+    db_stub.returns(mockPromise(true))
+    tweet.text = '@398Bot 献血'
+
+    // テスト返信を期待
+    client_mock.expects('tweet').once().withArgs(
+      '献血は1日1回までよ。', tweet
+    )
+
+    sakuyaBot.read(tweet)
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
+  })
+
   it('リプライでないツイートには反応しない', () => {
     let tweet = createTweetMock()
     tweet.text = 'テスト'

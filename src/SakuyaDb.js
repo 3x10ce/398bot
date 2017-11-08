@@ -102,7 +102,7 @@ let SakuyaDb = class {
     console.dir(user)
     let collection = this.db.collection('donate')
     return collection.insertOne({
-      'user_id': user.id_str,
+      '_id': user.id_str,
       'amount': amount
     })
   }
@@ -110,11 +110,12 @@ let SakuyaDb = class {
   /**
    * 指定したユーザが献血していたかどうかを調べます。
    * @param {UserObject} user
-   * @return findの結果
+   * @return 献血している場合はtrue, それ以外はfalseを返却するPromise
    */
   userIsDonated(user) {
     let collection = this.db.collection('donate')
-    collection.findOne({ '_id': user.id_str})
+    return collection.findOne({ '_id': user.id_str})
+      .then( (r) => Promise.resolve( r !== null))
   }
 
   /**

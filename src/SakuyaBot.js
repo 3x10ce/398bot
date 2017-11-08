@@ -105,14 +105,22 @@ const SakuyaBot = class {
             })
         }
       } else if (tweet.text.match(/献血/)) {
-        let donated = this.rand.genInt(200) + 200
-        return this.db.addDonateLog(tweet.user, donated)
-          .then( () => {
-            return this.client.tweet(`あなたの血を ${donated} mL頂いたわ。お嬢様もきっと喜ぶと思うわ。どうもありがとう。`, tweet)
+        return this.db.userIsDonated(tweet.user)
+          .then( (donated) => {
+            if (!donated) {
+              // 献血していない場合
+              let donateAmount = this.rand.genInt(200) + 200
+              return this.db.addDonateLog(tweet.user, donateAmount)
+                .then( () => {
+                  return this.client.tweet(`あなたの血を ${donateAmount} mL頂いたわ。お嬢様もきっと喜ぶと思うわ。どうもありがとう。`, tweet)
+                })
+
+            } else {
+              // 献血している場合
+              return this.client.tweet(`献血は1日1回までよ。`, tweet)
+            }
           })
       }
-      
-      return Promise.resolve(null)
     }).then((result) => {
       
       // 何か応答を行なった場合はログに残す
