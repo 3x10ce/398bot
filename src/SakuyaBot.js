@@ -87,21 +87,28 @@ const SakuyaBot = class {
         .replace(':NAME:', tweet.user.name.split(/[@＠]/))
         .replace(':NAME_ORG:', tweet.user.name.replace(/[@＠]/, ' at '))
         .replace('[a-z]+://', '[url]')
+        
       // 返信する
       if (tweet.text.match(/こんにちは/)) {
         return this.client.tweet(`${callAs}、こんにちは。`, tweet)
 
       } else if (tweet.text.match(/紅茶/)) {
         let tea = this.teaSelector(tweet.user)
-        return this.client.tweet(`はい、${tea.name}を淹れてみましたわ。花言葉は${tea.language_of}ね。召し上がれ。`, tweet)
+        let message = this.rand.choice(
+          `はい、${tea.name}を淹れてみましたわ。花言葉は${tea.language_of}ね。召し上がれ。`,
+          `今日のお茶は${tea.name}よ。花言葉は${tea.language_of}ね。どうぞ召し上がれ。`
+        )
+        return this.client.tweet(message, tweet)
 
       } else if (tweet.text.match(/誕生日/)) {
         let [, m, d] = (tweet.text.match(/誕生日は([12][0-9])月([1-3][0-9])日/) || [] )
+        
+        // todo: 不正な日付を与えられた時にガードする
 
         if( m !== undefined && d !== undefined) {
           return this.db.setBirthday(tweet.user, m, d)
             .then(() => {
-              return this.client.tweet(`あなたの誕生日は${m}月${d}日なのね。`, tweet)
+              return this.client.tweet(`あなたの誕生日は${m}月${d}日なのね。覚えたわ。`, tweet)
             })
         }
       } else if (tweet.text.match(/献血/)) {
