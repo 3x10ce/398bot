@@ -20,5 +20,14 @@ module.exports = {
    */
   gen: () => {
     return Math.random()
+  },
+
+  /**
+   * 与えられた配列のうち任意の要素をランダムに選択して返却します。
+   * @param list {array} 対象の配列
+   * @return {any} 任意に選ばれた1要素
+   */
+  choice: (list) => {
+    return list[ (Math.random() * list.length)|0 ]
   }
 }
