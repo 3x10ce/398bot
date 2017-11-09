@@ -61,7 +61,8 @@ let client = {
 
 let rand = {
   genInt: () => (0),
-  gen: () => (0.0)
+  gen: () => (0.0),
+  choice: (list) => list[0]
 }
 
 let sakuyaBot = new SakuyaBot(client, db, logger, rand)
@@ -107,7 +108,7 @@ describe('口上反応テスト', () => {
 
     // テスト返信を期待
     client_mock.expects('tweet').once().withArgs(
-      'あなたの誕生日は10月15日なのね。', tweet
+      'あなたの誕生日は10月15日なのね。覚えたわ。', tweet
     )
 
     sakuyaBot.read(tweet)
@@ -137,6 +138,20 @@ describe('口上反応テスト', () => {
     // テスト返信を期待
     client_mock.expects('tweet').once().withArgs(
       '献血は1日1回までよ。', tweet
+    )
+
+    sakuyaBot.read(tweet)
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
+  })
+
+  it('呼び名設定', () => {
+    let tweet = createTweetMock()
+    tweet.text = '@398Bot 「:NAME:君」って呼んで'
+
+    // テスト返信を期待
+    client_mock.expects('tweet').once().withArgs(
+      'Annonymous君…って呼べばいいのね。', tweet
     )
 
     sakuyaBot.read(tweet)

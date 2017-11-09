@@ -81,12 +81,7 @@ const SakuyaBot = class {
       if( userdata.ops !== undefined) userdata = userdata.ops[0]
       
       // 呼び名設定
-      //  :NAME: -> ユーザの名前(@以降を含めず)
-      //  :NAME_ORG: -> ユーザの名前(@以降を含める)
-      let callAs = userdata.nickname
-        .replace(':NAME:', tweet.user.name.split(/[@＠]/))
-        .replace(':NAME_ORG:', tweet.user.name.replace(/[@＠]/, ' at '))
-        .replace('[a-z]+://', '[url]')
+      let callAs = this._replaceNN(userdata.nickname, tweet.user)
         
       // 返信する
       if (tweet.text.match(/こんにちは/)) {
@@ -94,10 +89,10 @@ const SakuyaBot = class {
 
       } else if (tweet.text.match(/紅茶/)) {
         let tea = this.teaSelector(tweet.user)
-        let message = this.rand.choice(
+        let message = this.rand.choice([
           `はい、${tea.name}を淹れてみましたわ。花言葉は${tea.language_of}ね。召し上がれ。`,
           `今日のお茶は${tea.name}よ。花言葉は${tea.language_of}ね。どうぞ召し上がれ。`
-        )
+        ])
         return this.client.tweet(message, tweet)
 
       } else if (tweet.text.match(/誕生日/)) {
@@ -110,6 +105,12 @@ const SakuyaBot = class {
             .then(() => {
               return this.client.tweet(`あなたの誕生日は${m}月${d}日なのね。覚えたわ。`, tweet)
             })
+        }
+      } else if (tweet.text.match(/((と|って)呼んで)/)) {
+        let newNickname = (tweet.text.match(/「(.+)」/) || [])[1]
+        if (newNickname !== undefined) {
+          callAs = this._replaceNN(newNickname, tweet.user)
+          return this.client.tweet(`${callAs}…って呼べばいいのね。`, tweet)
         }
       } else if (tweet.text.match(/献血/)) {
         return this.db.userIsDonated(tweet.user)
@@ -163,6 +164,21 @@ const SakuyaBot = class {
       }
     }
     return Promise.resolve(null)
+  }
+
+  /******** 以降はprivate methodとして運用 ********/
+
+  /**
+   * 与えられた文字列をニックネームとして文字置換する
+   * @param nickname {string} ニックネーム文字列
+   * @param user {UserObject} ユーザオブジェクト
+   * @return 置換後のニックネーム文字列
+   */
+  _replaceNN (nickname, user) {
+    return nickname
+      .replace(':NAME:', user.name.split(/[@＠]/)[0])
+      .replace(':NAME_ORG:', user.name.replace(/[@＠]/, ' at '))
+      .replace('[a-z]+://', '[url]')
   }
 }
 
