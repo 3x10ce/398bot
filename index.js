@@ -48,3 +48,24 @@ Scheduler.scheduleJob({
 let autoRemove = new FollowCrawler(client)
 autoRemove.start()
 
+
+// heap log dump
+const PROFILE_DUMP_INTERVAL = 10000
+setInterval( (() => {
+  let cpuInfoPrev = process.cpuUsage()
+  let prevDate = new Date()
+  return () => {
+    let now = new Date()
+    let elapsed = ( now - prevDate ) * 1000
+    let cpuInfo = process.cpuUsage()
+    let cpuUserPer = (cpuInfo.user - cpuInfoPrev.user) * 100 / elapsed
+    let cpuSystemPer = (cpuInfo.system - cpuInfoPrev.system) * 100 / elapsed
+    logger.info(`CPU user: ${cpuUserPer.toFixed(2)}% system: ${cpuSystemPer.toFixed(2)}%`)
+
+    let memoryInfo = process.memoryUsage()
+    logger.info(`MEMORY app_used: ${memoryInfo.rss} v8_total: ${memoryInfo.heapTotal} v8_used: ${memoryInfo.heapUsed}`)
+    
+    cpuInfoPrev = cpuInfo
+    prevDate = now
+  }
+})(), PROFILE_DUMP_INTERVAL)
