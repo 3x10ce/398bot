@@ -96,15 +96,22 @@ const SakuyaBot = class {
         return this.client.tweet(message, tweet)
 
       } else if (tweet.text.match(/誕生日/)) {
-        let [, m, d] = (tweet.text.match(/誕生日は([12][0-9])月([1-3][0-9])日/) || [] )
-        
-        // todo: 不正な日付を与えられた時にガードする
+        let [, m, d] = (tweet.text.match(/誕生日は([12]?[0-9])月([1-3]?[0-9])日/) || [] )
 
         if( m !== undefined && d !== undefined) {
-          return this.db.setBirthday(tweet.user, m, d)
-            .then(() => {
-              return this.client.tweet(`あなたの誕生日は${m}月${d}日なのね。覚えたわ。`, tweet)
-            })
+
+          // 不正な日付を与えられた時にガードする
+          let dayOfMonth = [31,29,31,30,31,30,31,31,30,31,30,31][Number(m) - 1]
+          if ( m > 0 && m <= 12 &&
+               d > 0 && d <= dayOfMonth) {
+
+            return this.db.setBirthday(tweet.user, m, d)
+              .then(() => {
+                return this.client.tweet(`あなたの誕生日は${m}月${d}日なのね。覚えたわ。`, tweet)
+              })
+          }
+          
+          return Promise.resolve(null)
         }
       } else if (tweet.text.match(/((と|って)呼んで)/)) {
         let newNickname = (tweet.text.match(/「(.+)」/) || [])[1]

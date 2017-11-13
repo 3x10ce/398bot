@@ -102,7 +102,7 @@ describe('口上反応テスト', () => {
       .then(() => client_mock.verify())
       .catch((err) => { throw err })
   })
-  it('誕生日', () => {
+  it('誕生日1', () => {
     let tweet = createTweetMock()
     tweet.text = '@398Bot 誕生日は10月15日'
 
@@ -114,6 +114,62 @@ describe('口上反応テスト', () => {
     sakuyaBot.read(tweet)
       .then(() => client_mock.verify())
       .catch((err) => { throw err })
+  })
+  it('誕生日2', () => {
+    let tweet = createTweetMock()
+    tweet.text = '@398Bot 誕生日は1月31日'
+
+    // テスト返信を期待
+    client_mock.expects('tweet').once().withArgs(
+      'あなたの誕生日は1月31日なのね。覚えたわ。', tweet
+    )
+
+    sakuyaBot.read(tweet)
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
+  })
+  it('誕生日3', () => {
+    let tweet = createTweetMock()
+    tweet.text = '@398Bot 誕生日は12月1日'
+
+    // テスト返信を期待
+    client_mock.expects('tweet').once().withArgs(
+      'あなたの誕生日は12月1日なのね。覚えたわ。', tweet
+    )
+
+    sakuyaBot.read(tweet)
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
+  })
+  it('誕生日4', () => {
+    let tweet = createTweetMock()
+    tweet.text = '@398Bot 誕生日は2月29日'
+
+    // テスト返信を期待
+    client_mock.expects('tweet').once().withArgs(
+      'あなたの誕生日は2月29日なのね。覚えたわ。', tweet
+    )
+
+    sakuyaBot.read(tweet)
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
+  })
+  it('不正な誕生日のガード', () => {
+    let tweet = []
+    for(let i = 0; i < 5; i++) tweet.push(createTweetMock())
+    
+    tweet[0].text = '@398Bot 誕生日は0月14日'
+    tweet[1].text = '@398Bot 誕生日は13月20日'
+    tweet[2].text = '@398Bot 誕生日は9月0日'
+    tweet[3].text = '@398Bot 誕生日は9月32日'
+    tweet[4].text = '@398Bot 誕生日は2月30日'
+
+    // なにも返信しないことを期待
+    client_mock.expects('tweet').never()
+    Promise.all(tweet.map((v) => sakuyaBot.read(v))) 
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
+
   })
   it('献血', () => {
     let tweet = createTweetMock()
