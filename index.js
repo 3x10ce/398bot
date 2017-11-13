@@ -50,7 +50,7 @@ autoRemove.start()
 
 
 // heap log dump
-const PROFILE_DUMP_INTERVAL = 10000
+const PROFILE_DUMP_INTERVAL = 60000
 setInterval( (() => {
   let cpuInfoPrev = process.cpuUsage()
   let prevDate = new Date()
