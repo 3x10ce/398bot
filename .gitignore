@@ -59,3 +59,6 @@ typings/
 
 # 仕様元にしているソースコード
 oldsource/
+
+# リアクション定義ファイル
+src/res/reactions.json
