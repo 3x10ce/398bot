@@ -10,6 +10,7 @@ let Scheduler = require('node-schedule')
 
 let rand = require('./src/Randomizer')
 
+let sakuyaReplies = require('./src/SakuyaReplies')
 
 // 環境変数よみこみ
 require('dotenv').config()
@@ -37,6 +38,8 @@ let db = new MongoDb(process.env.mongo_database, server, {safe: true})
 let sdb = new SakuyaDb(db)
 
 let sakuyaBot = new SakuyaBot(client, sdb, logger, rand)
+sakuyaBot.addReactionPlugin(sakuyaReplies)
+
 sakuyaBot.start()
 Scheduler.scheduleJob({
   hour: 0,
