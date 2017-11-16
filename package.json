@@ -6,7 +6,8 @@
   "scripts": {
     "test": "npm run lint && npm run mocha",
     "lint": "eslint src/*.js",
-    "mocha": "mocha test/*"
+    "mocha": "mocha test/*",
+    "test-reactions": "mocha src/res/reactions.test.js"
   },
   "repository": {
     "type": "git",
