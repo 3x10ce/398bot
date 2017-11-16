@@ -8,8 +8,13 @@ const SakuyaBot = class {
     this.db = db
     this.logger = logger
     this.rand = rand
-    
 
+    // ツイートテキストを引数として、リアクションを返却する関数軍を
+    // SakuyaBotに任意に組み込むことができる機能を提供する。
+    // これを、リアクションプラグインと呼称し、
+    // SakuyaBotの汎用的な口上を組み込む仕組みとして利用する。
+    this.reaction_plugins = []
+    
     this.teaSelector = require('./Teapot.js')
     
     // 起動時にアカウントの有効性を確認する
@@ -34,6 +39,14 @@ const SakuyaBot = class {
       error: (error) => console.log(error),
       event: this.receive.bind(this)
     })
+  }
+
+  /**
+   * リアクションプラグインを組み込む
+   * @param func リアクションプラグイン
+   */
+  addReactionPlugin (plugin) {
+    this.reaction_plugins.push(plugin)
   }
 
   // 毎日 0時に実行する
@@ -135,6 +148,23 @@ const SakuyaBot = class {
               return this.client.tweet(`献血は1日1回までよ。`, tweet)
             }
           })
+      } else {
+        // リアクションプラグインから応答を返せる場合は応答する
+        for (let plugin of this.reaction_plugins) {
+          let reaction = plugin(tweet)
+          if (reaction) {
+            // 応答をランダムに選択
+            let reply = this.rand.choice(reaction.reply_patterns)
+            
+            // 好感度の増減がある場合は増減させる
+            return ( reaction.lovelity 
+              ? this.db.increaseLovelity(tweet.user, reaction.lovelity)
+              : Promise.resolve(null)
+            ).then( () => {
+              this.client.tweet(reply, tweet)
+            })
+          }
+        }
       }
     }).then((result) => {
       

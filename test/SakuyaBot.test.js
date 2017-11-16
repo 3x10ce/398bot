@@ -67,6 +67,14 @@ let rand = {
 
 let sakuyaBot = new SakuyaBot(client, db, logger, rand)
 sakuyaBot.teaSelector = () => ({name: '(紅茶名)', language_of: '(花言葉)', rarity: 1})
+
+// リアクションプラグインのmockを流し込む
+sakuyaBot.addReactionPlugin( (tweet) => {
+  return tweet.text.match(/テスト/)
+    ? { "reply_patterns": ["テスト返信"] }
+    : undefined
+})
+
 /* SakuyaBot test*/
 
 describe('口上反応テスト', () => {
@@ -84,6 +92,17 @@ describe('口上反応テスト', () => {
     tweet.text = '@398Bot ignored tweet'
     // ツイートを返さないことを期待
     client_mock.expects('tweet').never()
+
+    sakuyaBot.read(tweet)
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
+  })
+  it('リアクションプラグイン', () => {
+    let tweet = createTweetMock()
+
+    tweet.text = '@398Bot テスト'
+    // リアクションプラグインからリプライ文が生成されることを期待
+    client_mock.expects('tweet').once().withArgs('テスト返信', tweet)
 
     sakuyaBot.read(tweet)
       .then(() => client_mock.verify())
