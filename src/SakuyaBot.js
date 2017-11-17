@@ -96,83 +96,94 @@ const SakuyaBot = class {
       // 呼び名設定
       let callAs = this._replaceNN(userdata.nickname, tweet.user)
         
-      // 返信する
-      if (tweet.text.match(/こんにちは/)) {
-        return this.client.tweet(`${callAs}、こんにちは。`, tweet)
+      return new Promise((resolve) => {
 
-      } else if (tweet.text.match(/紅茶/)) {
-        let tea = this.teaSelector(tweet.user)
-        let message = this.rand.choice([
-          `はい、${tea.name}を淹れてみましたわ。花言葉は${tea.language_of}ね。召し上がれ。`,
-          `今日のお茶は${tea.name}よ。花言葉は${tea.language_of}ね。どうぞ召し上がれ。`
-        ])
-        return this.client.tweet(message, tweet)
-
-      } else if (tweet.text.match(/誕生日/)) {
-        let [, m, d] = (tweet.text.match(/誕生日は([12]?[0-9])月([1-3]?[0-9])日/) || [] )
-
-        if( m !== undefined && d !== undefined) {
-
-          // 不正な日付を与えられた時にガードする
-          let dayOfMonth = [31,29,31,30,31,30,31,31,30,31,30,31][Number(m) - 1]
-          if ( m > 0 && m <= 12 &&
-               d > 0 && d <= dayOfMonth) {
-
-            return this.db.setBirthday(tweet.user, m, d)
-              .then(() => {
-                return this.client.tweet(`あなたの誕生日は${m}月${d}日なのね。覚えたわ。`, tweet)
-              })
-          }
-          
-          return Promise.resolve(null)
-        }
-      } else if (tweet.text.match(/((と|って)呼んで)/)) {
-        let newNickname = (tweet.text.match(/「(.+)」/) || [])[1]
-        if (newNickname !== undefined) {
-          callAs = this._replaceNN(newNickname, tweet.user)
-          return this.client.tweet(`${callAs}…って呼べばいいのね。`, tweet)
-        }
-      } else if (tweet.text.match(/献血/)) {
-        return this.db.userIsDonated(tweet.user)
-          .then( (donated) => {
-            if (!donated) {
-              // 献血していない場合
-              let donateAmount = this.rand.genInt(200) + 200
-              return this.db.addDonateLog(tweet.user, donateAmount)
-                .then( () => {
-                  return this.client.tweet(`あなたの血を ${donateAmount} mL頂いたわ。お嬢様もきっと喜ぶと思うわ。どうもありがとう。`, tweet)
+        // 返信する
+        if (tweet.text.match(/こんにちは/)) {
+          resolve(`${callAs}、こんにちは。`)
+  
+        } else if (tweet.text.match(/紅茶/)) {
+          let tea = this.teaSelector(tweet.user)
+          let message = this.rand.choice([
+            `はい、${tea.name}を淹れてみましたわ。花言葉は${tea.language_of}ね。召し上がれ。`,
+            `今日のお茶は${tea.name}よ。花言葉は${tea.language_of}ね。どうぞ召し上がれ。`
+          ])
+          resolve(message, tweet)
+  
+        } else if (tweet.text.match(/誕生日は[0-9]+月[0-9]+日/)) {
+          let [, m, d] = (tweet.text.match(/誕生日は([12]?[0-9])月([1-3]?[0-9])日/) || [] )
+  
+          if( m !== undefined && d !== undefined) {
+  
+            // 不正な日付を与えられた時にガードする
+            let dayOfMonth = [31,29,31,30,31,30,31,31,30,31,30,31][Number(m) - 1]
+            if ( m > 0 && m <= 12 &&
+                 d > 0 && d <= dayOfMonth) {
+  
+              return this.db.setBirthday(tweet.user, m, d)
+                .then(() => {
+                  resolve(`あなたの誕生日は${m}月${d}日なのね。覚えたわ。`)
                 })
-
             } else {
-              // 献血している場合
-              return this.client.tweet(`献血は1日1回までよ。`, tweet)
+              resolve(null)
             }
-          })
-      } else {
-        // リアクションプラグインから応答を返せる場合は応答する
-        for (let plugin of this.reaction_plugins) {
-          let reaction = plugin(tweet)
-          if (reaction) {
-            // 応答をランダムに選択
-            let reply = this.rand.choice(reaction.reply_patterns)
-            
-            // 好感度の増減がある場合は増減させる
-            return ( reaction.lovelity 
-              ? this.db.increaseLovelity(tweet.user, reaction.lovelity)
-              : Promise.resolve(null)
-            ).then( () => {
-              this.client.tweet(reply, tweet)
-            })
           }
-        }
-      }
-    }).then((result) => {
-      
-      // 何か応答を行なった場合はログに残す
-      if (result === null) return
-      this.logger.debug(`[${result.id_str}]response: ${result.text}`)
-      console.log(result)
+        } else if (tweet.text.match(/「(.+)」((と|って)呼んで)/)) {
+          let newNickname = (tweet.text.match(/「(.+)」/) || [])[1]
+          if (newNickname !== undefined) {
+            callAs = this._replaceNN(newNickname, tweet.user)
+            resolve(`${callAs}…って呼べばいいのね。`)
 
+          } else {
+            resolve(null)
+          }
+        } else if (tweet.text.match(/献血/)) {
+          return this.db.userIsDonated(tweet.user)
+            .then( (donated) => {
+              if (!donated) {
+                // 献血していない場合
+                let donateAmount = this.rand.genInt(200) + 200
+                return this.db.addDonateLog(tweet.user, donateAmount)
+                  .then( () => (resolve(`あなたの血を ${donateAmount} mL頂いたわ。お嬢様もきっと喜ぶと思うわ。どうもありがとう。`) ))
+  
+              } else {
+                // 献血している場合
+                resolve(`献血は1日1回までよ。`)
+              }
+            })
+        } else {
+          // リアクションプラグインから応答を返せる場合は応答する
+          for (let plugin of this.reaction_plugins) {
+            let reaction = plugin(tweet)
+            if (reaction) {
+              // 応答をランダムに選択
+              let reply = this.rand.choice(reaction.reply_patterns)
+              
+              // 好感度の増減がある場合は増減させる
+              return ( reaction.lovelity 
+                ? this.db.increaseLovelity(tweet.user, reaction.lovelity)
+                : Promise.resolve(null)
+              ).then( () => {
+                resolve(reply)
+              })
+            }
+          }
+
+          resolve(null)
+        }
+      })
+      
+    }).then((reply) => {
+      // ツイートがある場合はツイートする
+      if (reply !== null) {
+        this.client.tweet(reply, tweet).then((result) => {
+          
+          // 何か応答を行なった場合はログに残す
+          if (result === null) return
+          this.logger.debug(`[${result.id_str}]response: ${result.text}`)
+          console.log(result)
+        })
+      }
     }).catch((err) => {
       if (err !== undefined) {
         this.logger.error(`error! : ${err}`)
