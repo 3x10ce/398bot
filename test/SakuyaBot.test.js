@@ -234,6 +234,19 @@ describe('口上反応テスト', () => {
       .catch((err) => { throw err })
   })
 
+  it('好感度チェック', () => {
+    let tweet = createTweetMock()
+
+    tweet.text = '@398Bot 私のことどう思う？'
+    
+    // 好感度に応じたリプライがされることを期待
+    client_mock.expects('tweet').once().withArgs('あなたへの好感度: 1.00', tweet)
+
+    sakuyaBot.read(tweet)
+      .then(() => client_mock.verify())
+      .catch((err) => { throw err })
+  })
+
   it('リプライでないツイートには反応しない', () => {
     let tweet = createTweetMock()
     tweet.text = 'テスト'

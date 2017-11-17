@@ -151,6 +151,17 @@ const SakuyaBot = class {
                 resolve(`献血は1日1回までよ。`)
               }
             })
+        } else if (tweet.text.match(/(俺|僕|私|(わ|あ)たし)の(こと|事)どう(思|おも)う(？|\?)/)) {
+          // 整数値で管理する好感度は、表記上は0.05刻みの少数値として表記する。
+          // 現在はひとまず、最小値0.00(0), 最大値5.00(100)としておく。
+          let normalized_lovelity = 
+            userdata.lovelity > 100 ? 100 :
+              userdata.lovelity < 0 ?   0 :
+                userdata.lovelity
+          let screen_lovelity = normalized_lovelity * 0.05
+          
+          resolve(`あなたへの好感度: ${screen_lovelity.toFixed(2)}`)
+
         } else {
           // リアクションプラグインから応答を返せる場合は応答する
           for (let plugin of this.reaction_plugins) {
