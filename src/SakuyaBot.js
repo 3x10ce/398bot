@@ -165,7 +165,7 @@ const SakuyaBot = class {
         } else {
           // リアクションプラグインから応答を返せる場合は応答する
           for (let plugin of this.reaction_plugins) {
-            let reaction = plugin(tweet)
+            let reaction = plugin(tweet, userdata)
             if (reaction) {
               // 応答をランダムに選択
               let reply = this.rand.choice(reaction.reply_patterns)
