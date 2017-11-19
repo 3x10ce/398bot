@@ -7,8 +7,9 @@ const reactions = require('./res/reactions.json')
  * reactionsデータのリファレンスとして、以下はコメントアウトで残しておく。
  */
 /*
-const reactions = {
-  "(?:メリー)?クリスマス": {   // リアクションのトリガーワード(正規表現)をキーに設定する。
+const reactions = [
+  {
+    trigger_word: "(?:メリー)?クリスマス"
     reply_patterns: [       // 返答するメッセージの配列。Botでこのパターンからランダムに1つ選択する。
       "リプライ1",
       "リプライ2",
@@ -20,8 +21,18 @@ const reactions = {
       min_lovelity: 20      // 必要な好感度の値(最小値)を設定する。
     },
     lovelity: 2             // 反応した際に上昇する好感度の数値を設定する。
-  }
-}
+  },
+  {
+    trigger_word: "(?:メリー)?クリスマス",
+    ...
+    // 同じtrigger_wordを持つreaction patternを設定することもできる。
+    // その場合は、先に指定したtrigger_wordの条件を満たさなかった時の
+    // フォールバックとして機能する。
+
+  },  
+  { ... },
+  ...
+]
  */
 
 /**
@@ -31,12 +42,11 @@ const reactions = {
  */
 module.exports = function(tweet, user) {
   let now = new Date()
-  for ( let pattern of Object.keys(reactions)) {
+  for ( let reaction of reactions) {
 
     // リアクションデータ
-    let reaction = reactions[pattern]
     // マッチパターンに一致するかチェック 一致しなければ終了
-    let matcher = new RegExp(pattern)
+    let matcher = new RegExp(reaction.trigger_word)
     if (!matcher.test(tweet.text)) continue
     // 条件判定
     // requiresパラメータがある場合は、そこに記載される

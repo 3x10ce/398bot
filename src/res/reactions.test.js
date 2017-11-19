@@ -16,11 +16,11 @@ describe('check reactions.json', () => {
 })
 
 describe('check each reaction format', () => {
-  Object.keys(reactions).forEach( (pattern) => {
-    let reaction = reactions[pattern]
-    describe(pattern, () => {
+  reactions.forEach( (reaction) => {
+    let trigger = reaction.trigger_word
+    describe(trigger, () => {
       it('マッチパターンの正規表現チェック', () => {
-        assert.strictEqual((new RegExp(pattern)) instanceof RegExp, true)
+        assert.strictEqual((new RegExp(trigger)) instanceof RegExp, true)
       })
 
       it('リプライパターンがStringの配列', () => {
@@ -30,8 +30,10 @@ describe('check each reaction format', () => {
       })
 
       it('好感度増減値が整数値', () => {
-        assert.strictEqual(typeof reaction.lovelity, 'number')
-        assert.strictEqual(Number.isInteger(reaction.lovelity), true)
+        if (reaction.lovelity) {
+          assert.strictEqual(typeof reaction.lovelity, 'number')
+          assert.strictEqual(Number.isInteger(reaction.lovelity), true)
+        }
       })
 
       it ('必要条件がある場合は各条件もチェックする', () => {
