@@ -12,6 +12,6 @@ npm install
 For development, replace `npm install` to `npm install --dev`
 
 # Requirement
-- Node.js 6.11.3 (npm 3.10.10)
+- Node.js 8.9.1 (npm 5.5.1)
 
 
