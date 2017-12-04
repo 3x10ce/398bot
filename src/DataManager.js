@@ -1,5 +1,7 @@
 'use strict'
 
+let AWS = require('aws-sdk')
+let S3 = new AWS.S3()
 /**
  * データストアとの中間層として機能するデータ管理クラスです。
  * SakuyaBotが保持するユーザデータの管理を行い、バックエンドでデータストアとの同期を実行します。
@@ -11,6 +13,17 @@ const DataManager = class {
   constructor (db) {
     /** @todo データストアからデータを取得する */
     this.db = db
+    this.users = {}
+    this.donates = {}
+  }
+
+  /**
+   * バックエンドのデータストアにクエリを発行します。
+   * @param query クエリ文
+   */
+  _executeQuery (query) {
+    /** @todo データストアにデータを格納する */
+    return query
   }
 
   /**
@@ -122,3 +135,31 @@ const DataManager = class {
 }
 
 module.exports = DataManager
+
+
+// test
+require('dotenv').config()
+
+// get object
+/*
+S3.getObject({
+  Bucket: 'sakuyabot-users',
+  Key: 'users.json',
+}, function (err, data) {
+  if( err ) console.error(err)
+  else console.log(data.Body.toString('utf-8'))
+})
+*/
+
+// put object
+/*
+S3.putObject({
+  Bucket: 'sakuyabot-users',
+  Key: 'users.json',
+  ContentType: 'application/json',
+  Body: '{"a":100, "b": "TEST"}'
+}, function (err, data) {
+  if( err ) console.error(err)
+  else console.log(data)
+})
+*/
