@@ -11,10 +11,32 @@ const DataManager = class {
    * 生成時、バックエンドのデータストアからデータを取得します。
    */
   constructor (db) {
-    /** @todo データストアからデータを取得する */
+    
     this.db = db
     this.users = {}
     this.donates = {}
+    this.readyToAccess = false
+
+    // S3からデータを取得する
+    Promise.all([
+      S3.getObject({
+        Bucket: 'sakuyabot-users',
+        Key: 'users.json',
+      }).promise(),
+      S3.getObject({
+        Bucket: 'sakuyabot-users',
+        Key: 'donates.json',
+      }).promise()
+    ]).then( (results) => {
+      // 取得完了時の処理
+      this.users = results[0].Body.toString('utf-8')
+      this.donates = results[1].Body.toString('utf-8')
+      this.readyToAccess = true
+
+    }).catch( (e) => {
+      // 失敗時はエラーをスローする
+      throw e
+    })
   }
 
   /**
@@ -145,19 +167,19 @@ require('dotenv').config()
 S3.getObject({
   Bucket: 'sakuyabot-users',
   Key: 'users.json',
-}, function (err, data) {
-  if( err ) console.error(err)
-  else console.log(data.Body.toString('utf-8'))
-})
+}).promise()
+  .then(function (data) {console.log(data.Body.toString('utf-8'))})
+  .catch(function (err) {console.error(err)})
 */
+
 
 // put object
 /*
 S3.putObject({
   Bucket: 'sakuyabot-users',
-  Key: 'users.json',
+  Key: 'donates.json',
   ContentType: 'application/json',
-  Body: '{"a":100, "b": "TEST"}'
+  Body: '{}'
 }, function (err, data) {
   if( err ) console.error(err)
   else console.log(data)
