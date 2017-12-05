@@ -10,7 +10,7 @@ const DataManager = class {
   /**
    * 生成時、バックエンドのデータストアからデータを取得します。
    */
-  constructor (db) {
+  constructor (db, bucketName, usersKey, donatesKey) {
     
     this.db = db
     this.users = {}
@@ -20,12 +20,12 @@ const DataManager = class {
     // S3からデータを取得する
     Promise.all([
       S3.getObject({
-        Bucket: 'sakuyabot-users',
-        Key: 'users.json',
+        Bucket: bucketName,
+        Key: usersKey,
       }).promise(),
       S3.getObject({
-        Bucket: 'sakuyabot-users',
-        Key: 'donates.json',
+        Bucket: bucketName,
+        Key: donatesKey,
       }).promise()
     ]).then( (results) => {
       // 取得完了時の処理
