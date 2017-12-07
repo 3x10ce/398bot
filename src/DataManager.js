@@ -10,22 +10,22 @@ const DataManager = class {
   /**
    * 生成時、バックエンドのデータストアからデータを取得します。
    */
-  constructor (db, bucketName, usersKey, donatesKey) {
+  constructor (s3) {
     
-    this.db = db
+    this.S3 = s3
     this.users = {}
     this.donates = {}
     this.readyToAccess = false
 
     // S3からデータを取得する
     Promise.all([
-      S3.getObject({
-        Bucket: bucketName,
-        Key: usersKey,
+      this.S3.getObject({
+        Bucket: process.env.S3BucketName,
+        Key: process.env.S3UsersKey,
       }).promise(),
-      S3.getObject({
-        Bucket: bucketName,
-        Key: donatesKey,
+      this.S3.getObject({
+        Bucket: process.env.S3BucketName,
+        Key: process.env.S3DonatesKey,
       }).promise()
     ]).then( (results) => {
       // 取得完了時の処理
@@ -40,14 +40,22 @@ const DataManager = class {
   }
 
   /**
-   * バックエンドのデータストアにクエリを発行します。
-   * @param query クエリ文
+   * 保持しているデータをS3に保存します。
    */
-  _executeQuery (query) {
-    /** @todo データストアにデータを格納する */
-    return query
+  save () {
+    return Promise.all([
+      this.S3.putObject({
+        Bucket: process.env.S3BucketName,
+        Key: process.env.S3UsersKey,
+        Body: JSON.stringify(this.users)
+      }).promise(),
+      this.S3.putObject({
+        Bucket: process.env.S3BucketName,
+        Key: process.env.S3DonatesKey,
+        Body: JSON.stringify(this.donates)
+      }).promise()
+    ])
   }
-
   /**
    * ユーザのドキュメントを作成します。
    * @param {UserObject} user TwitterのUser Object
