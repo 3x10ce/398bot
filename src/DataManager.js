@@ -1,5 +1,6 @@
 'use strict'
 
+
 /**
  * データストアとの中間層として機能するデータ管理クラスです。
  * SakuyaBotが保持するユーザデータの管理を行い、バックエンドでデータストアとの同期を実行します。
@@ -8,9 +9,8 @@ const DataManager = class {
   /**
    * 生成時、バックエンドのデータストアからデータを取得します。
    */
-  constructor (db) {
-    /** @todo データストアからデータを取得する */
-    this.db = db
+  constructor (s3) {
+    
   }
 
   /**
@@ -122,3 +122,68 @@ const DataManager = class {
 }
 
 module.exports = DataManager
+
+
+// test
+const mysql = require('mysql')
+const connection = mysql.createConnection({
+  host : 'localhost',
+  user : 'sakuya',
+  password: 'sakuyabot',
+  database: 'sakuyabot'
+})
+
+
+// 接続
+connection.connect()
+
+// userdataの設定
+connection.query('INSERT into users (id) value (?) ;', ['0000'], function (err, rows, fields) {
+  if (err) { console.log('err: ' + err) } 
+  else {console.log(rows,fields)}
+  /*
+   * OkPacket {
+   *   fieldCount: 0,
+   *   affectedRows: 1,
+   *   insertId: 0,
+   *   serverStatus: 2,
+   *   warningCount: 0,
+   *   message: '',
+   *   protocol41: true,
+   *   changedRows: 0 }
+   */
+})
+
+
+// userdataの設定
+connection.query('SELECT * from users;', function (err, rows, fields) {
+  if (err) { console.log('err: ' + err) } 
+  else {console.log(rows,fields)}
+  /**
+   * RowDataPacket {
+   *   id: '0000',
+   *   nickname: ':NAME:さん',
+   *   birth_m: null,
+   *   birth_d: null,
+   *   lovelity: 5 } ] [ FieldPacket {
+   *   catalog: 'def',
+   *   db: 'sakuyabot',
+   *   table: 'users',
+   *   orgTable: 'users',
+   *   name: 'id',
+   *   orgName: 'id',
+   *   charsetNr: 33,
+   *   length: 192,
+   *   type: 253,
+   *   flags: 20483,
+   *   decimals: 0,
+   *   default: undefined,
+   *   zeroFill: false,
+   *   protocol41: true }
+   */
+})
+
+/*
+ * create table users ( id nvarchar(64) primary key, nickname nvarchar(32) default ':NAME:さん', birth_m int, birth_d int, lovelity int default 5 );
+ * create table donates (id int primary key auto_increment, donatedAt datetime not null, userId nvarchar(64) not null, amount int not null)
+ */
