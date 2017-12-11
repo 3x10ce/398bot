@@ -9,8 +9,23 @@ const DataManager = class {
   /**
    * 生成時、バックエンドのデータストアからデータを取得します。
    */
-  constructor () {
-    
+  constructor (db) {
+    this.db = db
+  }
+
+  /**
+   * クエリを発行し、結果をPromiseで返却します。
+   * @param query クエリ
+   * @param value プレースホルダで置き換えるパラメータ
+   * @return 実行結果を返却するPromise
+   */
+  _query (query, value) {
+    return new Promise ((resolve, reject) => {
+      connection.query( query, value, (err, rows) => {
+        if (err) reject(err)
+        else resolve(rows)
+      })
+    })
   }
 
   /**
@@ -19,8 +34,10 @@ const DataManager = class {
    * @return insertの結果
    */
   createUser (user) {
-    /** @todo 関数の実装 */
-    return user
+    return this._query(
+      'INSERT into users (id, nickname, lovelity) value (?, ?, ?) ;', 
+      [user.id_str, ':NAME:さん', 5]
+    )
   }
 
   /** 
@@ -29,8 +46,10 @@ const DataManager = class {
    * @return ユーザデータ
    */
   getUser (user) {
-    /** @todo 関数の実装 */
-    return user
+    return this._query(
+      'SELECT * from users WHERE id = ?;',
+      [user.id_str]
+    )
   }
 
   /**
@@ -126,63 +145,32 @@ module.exports = DataManager
 
 // test
 const mysql = require('mysql')
+require('dotenv').config()
 const connection = mysql.createConnection({
-  host : 'localhost',
-  user : 'sakuya',
-  password: 'sakuyabot',
-  database: 'sakuyabot'
+  host : process.env.mysql_server,
+  user : process.env.mysql_user,
+  password: process.env.mysql_password,
+  database: process.env.mysql_database
 })
 
 
 // 接続
 connection.connect()
 
-// userdataの設定
-connection.query('INSERT into users (id) value (?) ;', ['0000'], function (err, rows, fields) {
-  if (err) { console.log('err: ' + err) } 
-  else {console.log(rows,fields)}
-  /*
-   * OkPacket {
-   *   fieldCount: 0,
-   *   affectedRows: 1,
-   *   insertId: 0,
-   *   serverStatus: 2,
-   *   warningCount: 0,
-   *   message: '',
-   *   protocol41: true,
-   *   changedRows: 0 }
-   */
-})
 
+let dm = new DataManager(connection)
 
-// userdataの設定
-connection.query('SELECT * from users;', function (err, rows, fields) {
-  if (err) { console.log('err: ' + err) } 
-  else {console.log(rows,fields)}
-  /**
-   * RowDataPacket {
-   *   id: '0000',
-   *   nickname: ':NAME:さん',
-   *   birth_m: null,
-   *   birth_d: null,
-   *   lovelity: 5 } ] [ FieldPacket {
-   *   catalog: 'def',
-   *   db: 'sakuyabot',
-   *   table: 'users',
-   *   orgTable: 'users',
-   *   name: 'id',
-   *   orgName: 'id',
-   *   charsetNr: 33,
-   *   length: 192,
-   *   type: 253,
-   *   flags: 20483,
-   *   decimals: 0,
-   *   default: undefined,
-   *   zeroFill: false,
-   *   protocol41: true }
-   */
-})
+// createUser
+dm.createUser(
+  {id_str: "00000000"}
+).then((rows) => { console.log(rows) }
+).catch((err) => { throw err })
 
+// getUser
+dm.getUser(
+  {id_str: "00000000"}
+).then((rows) => { console.log(rows[0]) }
+).catch((err) => { throw err })
 /*
  * create table users ( id nvarchar(64) primary key, nickname nvarchar(32) default ':NAME:さん', birth_m int, birth_d int, lovelity int default 5 );
  * create table donates (id int primary key auto_increment, donatedAt datetime not null, userId nvarchar(64) not null, amount int not null)
