@@ -9,7 +9,7 @@ const DataManager = class {
   /**
    * 生成時、バックエンドのデータストアからデータを取得します。
    */
-  constructor (s3) {
+  constructor () {
     
   }
 
