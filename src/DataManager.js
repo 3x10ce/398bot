@@ -49,7 +49,7 @@ const DataManager = class {
     return this._query(
       'SELECT * from users WHERE id = ?;',
       [user.id_str]
-    )
+    ).then( (data) => { return data[0] })
   }
 
   /**
@@ -59,8 +59,10 @@ const DataManager = class {
    * @return updateの結果
    */
   _updateUser (user, data) {
-    /** @todo 関数の実装 */
-    return [user, data]
+    return this._query(
+      'UPDATE users set ? WHERE id = ?;',
+      [data, user.id_str]
+    )
   }
 
   /**
@@ -161,16 +163,23 @@ connection.connect()
 let dm = new DataManager(connection)
 
 // createUser
-dm.createUser(
-  {id_str: "00000000"}
-).then((rows) => { console.log(rows) }
-).catch((err) => { throw err })
+// dm.createUser(
+//   {id_str: "00000000"}
+// ).then((rows) => { console.log(rows) }
+// ).catch((err) => { throw err })
 
 // getUser
-dm.getUser(
-  {id_str: "00000000"}
-).then((rows) => { console.log(rows[0]) }
-).catch((err) => { throw err })
+// dm.getUser(
+//   {id_str: "00000000"}
+// ).then((rows) => { console.log(rows) }
+// ).catch((err) => { console.error(err) })
+
+// updateUser
+// dm._updateUser(
+//   {id_str: "00000000"},
+//   {lovelity: 10}
+// ).then((rows) => { console.log(rows) }
+// ).catch((err) => { console.error(err) })
 /*
  * create table users ( id nvarchar(64) primary key, nickname nvarchar(32) default ':NAME:さん', birth_m int, birth_d int, lovelity int default 5 );
  * create table donates (id int primary key auto_increment, donatedAt datetime not null, userId nvarchar(64) not null, amount int not null)
