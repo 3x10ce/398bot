@@ -72,8 +72,7 @@ const DataManager = class {
    * @return updateの結果
    */
   setNickname (user, nickname) {
-    /** @todo 関数の実装 */
-    return [user, nickname]
+    return this._updateUser(user, {nickname: nickname})
   }
 
 
@@ -86,8 +85,7 @@ const DataManager = class {
    * [hint]月と日のみで管理する。Date.yearは2000でMASKする。
    */
   setBirthday (user, month, day) {
-    /** @todo 関数の実装 */
-    return [user, month, day]
+    return this._updateUser(user, {birth_m: month, birth_d: day})
   }
 
   /**
