@@ -129,7 +129,10 @@ const DataManager = class {
    */
   userIsDonated(user) {
     /** @todo 関数の実装 */
-    return user
+    return this._query(
+      'SELECT count(*) as DC from donates WHERE userId = ? and donatedAt BETWEEN concat(CURDATE(), " 00:00:00") and concat(CURDATE(), " 23:59:59");',
+      [user.id_str]
+    ).then( (data) => data[0].DC > 0 )
   }
 
   /**
@@ -171,6 +174,13 @@ connection.connect()
 
 
 // let dm = new DataManager(connection)
+
+// createUser
+// dm.userIsDonated(
+//   {id_str: "00000000"}
+// ).then((rows) => { console.log(rows) }
+// ).catch((err) => { throw err })
+
 
 // createUser
 // dm.createUser(
