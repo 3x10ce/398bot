@@ -29,6 +29,17 @@ const DataManager = class {
   }
 
   /**
+   * トランザクションを生成します。
+   * @param transaction トランザクション内で実行する処理(関数)
+   */
+  _transaction (transaction) {
+    connection.beginTransaction( (err) => {
+      if (err) throw err
+      else transaction()
+    })
+  }
+
+  /**
    * ユーザのドキュメントを作成します。
    * @param {UserObject} user TwitterのUser Object
    * @return insertの結果
@@ -89,14 +100,13 @@ const DataManager = class {
   }
 
   /**
-   * 指定したIDのユーザの好感度を増減します。
+   * 指定したIDのユーザの好感度を設定します。。
    * @param {UserObject} user TwitterのUser Object
-   * @param {number} incremental 増減量
+   * @param {number} lovelity 好感度値
    * @return updateの結果
    */
-  increaseLovelity (user, incremental) {
-    /** @todo 関数の実装 */
-    return [user, incremental]
+  setLovelity (user, lovelity) {
+    return this._updateUser(user, {lovelity: lovelity})
   }
 
   /**
@@ -106,8 +116,10 @@ const DataManager = class {
    * @return updateの結果
    */
   addDonateLog(user, amount) {
-    /** @todo 関数の実装 */
-    return [user, amount]
+    return this._query(
+      'INSERT into donates (userId, donatedAt, amount) value (?, NOW(), ?);',
+      [user.id_str, amount]
+    )
   }
 
   /**
@@ -158,7 +170,7 @@ const connection = mysql.createConnection({
 connection.connect()
 
 
-let dm = new DataManager(connection)
+// let dm = new DataManager(connection)
 
 // createUser
 // dm.createUser(
