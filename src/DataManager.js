@@ -128,8 +128,6 @@ const DataManager = class {
    * @return 献血している場合はtrue, それ以外はfalse
    */
   userIsDonated(user) {
-    /** @todo 関数の実装 */
-    /** @todo DATETIMEで持たせると日別検索・集計にインデックスが使いにくいため、DATE型でも持って置くカラムが欲しい。 */
     return this._query(
       'SELECT count(*) as DC from donates WHERE userId = ? and donatedAt BETWEEN concat(CURDATE(), " 00:00:00") and concat(CURDATE(), " 23:59:59");',
       [user.id_str]
@@ -141,8 +139,9 @@ const DataManager = class {
    * @return {number} 献血量
    */
   sumDonation () {
-    /** @todo 関数の実装 */
-    return false
+    return this._query(
+      'SELECT sum(amount) as Total from donates;'
+    ).then( (data) => data[0] )
   }
 
   /**
