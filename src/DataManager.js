@@ -129,6 +129,7 @@ const DataManager = class {
    */
   userIsDonated(user) {
     /** @todo 関数の実装 */
+    /** @todo DATETIMEで持たせると日別検索・集計にインデックスが使いにくいため、DATE型でも持って置くカラムが欲しい。 */
     return this._query(
       'SELECT count(*) as DC from donates WHERE userId = ? and donatedAt BETWEEN concat(CURDATE(), " 00:00:00") and concat(CURDATE(), " 23:59:59");',
       [user.id_str]
@@ -172,8 +173,22 @@ const connection = mysql.createConnection({
 // 接続
 connection.connect()
 
+let dm = new DataManager(connection)
 
-// let dm = new DataManager(connection)
+
+// 献血テーブルに履歴を大量投入する
+
+// let loop = function (i) {
+//   return dm._query(
+//     'INSERT into donates (userId, donatedAt, amount) value (?, from_unixtime(?), ?);',
+//     [
+//       "00000000".concat().slice(-8), 
+//       (new Date(Date.now()).getTime()) / 1000 - Math.floor(Math.random() * 86400 * 7),
+//       Math.floor(Math.random() * 200)
+//     ]
+//   ).then( () => { i%1000 || console.log(i); i >= 10000 || loop(i+1)} )
+// }
+// loop(0)
 
 // createUser
 // dm.userIsDonated(
@@ -200,7 +215,24 @@ connection.connect()
 //   {lovelity: 10}
 // ).then((rows) => { console.log(rows) }
 // ).catch((err) => { console.error(err) })
-/*
+
+
+
+/** 
+ * @todo 以下のメモ書きは後ほど実装に利用する。
+ * 
+ * table の create
  * create table users ( id nvarchar(64) primary key, nickname nvarchar(32) default ':NAME:さん', birth_m int, birth_d int, lovelity int default 5 );
  * create table donates (id int primary key auto_increment, donatedAt datetime not null, userId nvarchar(64) not null, amount int not null)
+ * 
+ * 今日の献血量合計を取得
+ * select sum(amount), date(donatedAt) as donatedAtDate from donates where donatedAt >= CURDATE() group by donatedAtDate;
+ * 
+ * 昨日の献血量合計を取得
+ * select sum(amount), date(donatedAt) as donatedAtDate from donates where donatedAt < CURDATE() and donatedAt >= DATE_SUB( CURDATE(), INTERVAL 1 day ) groupby donatedAtDate;
+ * 
+ * 直近5日の合計を取得
+ * select sum(amount), date(donatedAt) as donatedAtDate from donates where donatedAt >= DATE_SUB( CURDATE(), INTERVAL 4 day ) group by donatedAtDate;
+ * 
  */
+
