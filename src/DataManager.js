@@ -30,12 +30,20 @@ const DataManager = class {
 
   /**
    * トランザクションを生成します。
-   * @param transaction トランザクション内で実行する処理(関数)
+   * @param transaction トランザクション内で実行する処理(Promise)
    */
   _transaction (transaction) {
-    connection.beginTransaction( (err) => {
-      if (err) throw err
-      else transaction()
+    return new Promise ( (resolve, reject) => {
+      // トランザクション開始
+      connection.beginTransaction( (err) => {
+        if (err) throw err
+        else {
+          // トランザクション処理
+          transaction()
+            .then ( () => connection.commit( (err) => err ? reject(err) : resolve() ))
+            .catch( (err) => connection.rollback( () => { throw err }) ) 
+        }
+      })
     })
   }
 
@@ -150,8 +158,16 @@ const DataManager = class {
    * @return delete結果
    */
   stashDonatedLog () {
-    /** @todo 関数の実装 */
-    return false
+    return this._transaction( () => {
+      return this.sumDonation()
+        .then( (sum) => {
+          // 合計量を昨日の分として donatesByDate に挿入
+          let yesterday = new Date(Date.now() - 86400 * 1000).toISOString().slice(0,10)
+          return this._query( 'INSERT into donatesByDate (donatedAtDate, amount) value (?, ?)', [yesterday, sum.Total] )
+        }).then( () => 
+          this._query( 'DELETE from donates;')
+        )
+    })
   }
 }
 
@@ -172,20 +188,21 @@ const connection = mysql.createConnection({
 // 接続
 connection.connect()
 
-let dm = new DataManager(connection)
-
+// let dm = new DataManager(connection)
+// dm.stashDonatedLog()
+//   .then((rows) => { console.log(rows) })
+//   .catch((err) => { throw err })
 
 // 献血テーブルに履歴を大量投入する
-
 // let loop = function (i) {
 //   return dm._query(
 //     'INSERT into donates (userId, donatedAt, amount) value (?, from_unixtime(?), ?);',
 //     [
 //       "00000000".concat().slice(-8), 
-//       (new Date(Date.now()).getTime()) / 1000 - Math.floor(Math.random() * 86400 * 7),
+//       (new Date(Date.now()).getTime()) / 1000 - Math.floor(Math.random() * 40000),
 //       Math.floor(Math.random() * 200)
 //     ]
-//   ).then( () => { i%1000 || console.log(i); i >= 10000 || loop(i+1)} )
+//   ).then( () => { i%1000 || console.log(i); i >= 100 || loop(i+1)} )
 // }
 // loop(0)
 
@@ -222,7 +239,8 @@ let dm = new DataManager(connection)
  * 
  * table の create
  * create table users ( id nvarchar(64) primary key, nickname nvarchar(32) default ':NAME:さん', birth_m int, birth_d int, lovelity int default 5 );
- * create table donates (id int primary key auto_increment, donatedAt datetime not null, userId nvarchar(64) not null, amount int not null)
+ * create table donates (id int primary key auto_increment, donatedAt datetime not null, userId nvarchar(64) not null, amount int not null);
+ * create table donatesByDate ( donatedAtDate date primary key, amount int not null );
  * 
  * 今日の献血量合計を取得
  * select sum(amount), date(donatedAt) as donatedAtDate from donates where donatedAt >= CURDATE() group by donatedAtDate;
