@@ -1,11 +1,10 @@
 
 let SakuyaBot = require('./src/SakuyaBot')
-let SakuyaDb = require('./src/SakuyaDb')
+let DataManager = require('./src/DataManager')
 let Twitter = require('twitter')
 let TwitterClient = require('./src/TwitterClient')
 let FollowCrawler = require('./src/FollowingCrawler')
-let MongoDb = require('mongodb').Db
-let MongoServer = require('mongodb').Server
+let MySQL = require('mysql')
 let Scheduler = require('node-schedule')
 
 let rand = require('./src/Randomizer')
@@ -32,12 +31,16 @@ let logger = log4js.getLogger('system')
 
 
 // DB instance生成
-let server = new MongoServer(process.env.mongo_server, process.env.mongo_port)
-let db = new MongoDb(process.env.mongo_database, server, {safe: true})
+const connection = MySQL.createConnection({
+  host : process.env.mysql_server,
+  user : process.env.mysql_user,
+  password: process.env.mysql_password,
+  database: process.env.mysql_database
+})
+connection.connect()
+let dataManager = new DataManager(connection)
 
-let sdb = new SakuyaDb(db)
-
-let sakuyaBot = new SakuyaBot(client, sdb, logger, rand)
+let sakuyaBot = new SakuyaBot(client, dataManager, logger, rand)
 sakuyaBot.addReactionPlugin(sakuyaReplies)
 
 sakuyaBot.start()

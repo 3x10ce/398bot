@@ -21,7 +21,7 @@ const DataManager = class {
    */
   _query (query, value) {
     return new Promise ((resolve, reject) => {
-      connection.query( query, value, (err, rows) => {
+      this.db.query( query, value, (err, rows) => {
         if (err) reject(err)
         else resolve(rows)
       })
@@ -35,13 +35,13 @@ const DataManager = class {
   _transaction (transaction) {
     return new Promise ( (resolve, reject) => {
       // トランザクション開始
-      connection.beginTransaction( (err) => {
+      this.db.beginTransaction( (err) => {
         if (err) throw err
         else {
           // トランザクション処理
           transaction()
-            .then ( () => connection.commit( (err) => err ? reject(err) : resolve() ))
-            .catch( (err) => connection.rollback( () => { throw err }) ) 
+            .then ( () => this.db.commit( (err) => err ? reject(err) : resolve() ))
+            .catch( (err) => this.db.rollback( () => { throw err }) ) 
         }
       })
     })
@@ -174,21 +174,7 @@ const DataManager = class {
 module.exports = DataManager
 
 
-// test
-const mysql = require('mysql')
-require('dotenv').config()
-const connection = mysql.createConnection({
-  host : process.env.mysql_server,
-  user : process.env.mysql_user,
-  password: process.env.mysql_password,
-  database: process.env.mysql_database
-})
-
-
-// 接続
-connection.connect()
-
-// let dm = new DataManager(connection)
+// let dm = new DataManager(this.db)
 // dm.stashDonatedLog()
 //   .then((rows) => { console.log(rows) })
 //   .catch((err) => { throw err })
