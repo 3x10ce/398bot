@@ -172,7 +172,7 @@ const SakuyaBot = class {
               
               // 好感度の増減がある場合は増減させる
               return ( reaction.lovelity 
-                ? this.db.increaseLovelity(tweet.user, reaction.lovelity)
+                ? this.db.setLovelity(tweet.user, userdata.lovelity + reaction.lovelity)
                 : Promise.resolve(null)
               ).then( () => {
                 resolve(reply)
