@@ -1,11 +1,5 @@
 'use strict'
 
-<<<<<<< HEAD
-
-=======
-let AWS = require('aws-sdk')
-let S3 = new AWS.S3()
->>>>>>> 5516776cd80daa4887c000561e3e6553fb92b554
 /**
  * データストアとの中間層として機能するデータ管理クラスです。
  * SakuyaBotが保持するユーザデータの管理を行い、バックエンドでデータストアとの同期を実行します。
@@ -14,7 +8,6 @@ const DataManager = class {
   /**
    * 生成時、バックエンドのデータストアからデータを取得します。
    */
-<<<<<<< HEAD
   constructor (db) {
     this.db = db
   }
@@ -53,54 +46,6 @@ const DataManager = class {
     })
   }
 
-=======
-  constructor (s3) {
-    
-    this.S3 = s3
-    this.users = {}
-    this.donates = {}
-    this.readyToAccess = false
-
-    // S3からデータを取得する
-    Promise.all([
-      this.S3.getObject({
-        Bucket: process.env.S3BucketName,
-        Key: process.env.S3UsersKey,
-      }).promise(),
-      this.S3.getObject({
-        Bucket: process.env.S3BucketName,
-        Key: process.env.S3DonatesKey,
-      }).promise()
-    ]).then( (results) => {
-      // 取得完了時の処理
-      this.users = results[0].Body.toString('utf-8')
-      this.donates = results[1].Body.toString('utf-8')
-      this.readyToAccess = true
-
-    }).catch( (e) => {
-      // 失敗時はエラーをスローする
-      throw e
-    })
-  }
-
-  /**
-   * 保持しているデータをS3に保存します。
-   */
-  save () {
-    return Promise.all([
-      this.S3.putObject({
-        Bucket: process.env.S3BucketName,
-        Key: process.env.S3UsersKey,
-        Body: JSON.stringify(this.users)
-      }).promise(),
-      this.S3.putObject({
-        Bucket: process.env.S3BucketName,
-        Key: process.env.S3DonatesKey,
-        Body: JSON.stringify(this.donates)
-      }).promise()
-    ])
-  }
->>>>>>> 5516776cd80daa4887c000561e3e6553fb92b554
   /**
    * ユーザのドキュメントを作成します。
    * @param {UserObject} user TwitterのUser Object
@@ -228,7 +173,6 @@ const DataManager = class {
 module.exports = DataManager
 
 
-<<<<<<< HEAD
 // let dm = new DataManager(this.db)
 // dm.stashDonatedLog()
 //   .then((rows) => { console.log(rows) })
@@ -294,31 +238,3 @@ module.exports = DataManager
  * 
  */
 
-=======
-// test
-require('dotenv').config()
-
-// get object
-/*
-S3.getObject({
-  Bucket: 'sakuyabot-users',
-  Key: 'users.json',
-}).promise()
-  .then(function (data) {console.log(data.Body.toString('utf-8'))})
-  .catch(function (err) {console.error(err)})
-*/
-
-
-// put object
-/*
-S3.putObject({
-  Bucket: 'sakuyabot-users',
-  Key: 'donates.json',
-  ContentType: 'application/json',
-  Body: '{}'
-}, function (err, data) {
-  if( err ) console.error(err)
-  else console.log(data)
-})
-*/
->>>>>>> 5516776cd80daa4887c000561e3e6553fb92b554
