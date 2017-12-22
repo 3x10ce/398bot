@@ -39,7 +39,7 @@ const DataManager = class {
         else {
           // トランザクション処理
           transaction()
-            .then ( () => this.db.commit( (err) => err ? reject(err) : resolve() ))
+            .then ( (data) => this.db.commit( (err) => err ? reject(err) : resolve(data) ))
             .catch( (err) => this.db.rollback( () => { throw err }) ) 
         }
       })
@@ -49,13 +49,15 @@ const DataManager = class {
   /**
    * ユーザのドキュメントを作成します。
    * @param {UserObject} user TwitterのUser Object
-   * @return insertの結果
+   * @return 作成されたユーザドキュメント
    */
   createUser (user) {
-    return this._query(
-      'INSERT into users (id, nickname, lovelity) value (?, ?, ?) ;', 
-      [user.id_str, ':NAME:さん', 5]
-    )
+    return this._transaction( () => {
+      return this._query(
+        'INSERT into users (id, nickname, lovelity) value (?, ?, ?) ;', 
+        [user.id_str, ':NAME:さん', 5]
+      ).then( () => this.getUser(user))
+    })
   }
 
   /** 
