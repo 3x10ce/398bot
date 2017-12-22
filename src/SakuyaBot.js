@@ -87,18 +87,18 @@ const SakuyaBot = class {
 
     // ユーザ情報を作成する
     }).then( (user) => {
-      if (user !== null) {
+      this.logger.debug(user)
+      if (user !== undefined) {
         return Promise.resolve(user)
       } else {
         return this.db.createUser(tweet.user)
       }
     }).then( (userdata) => {
-      // createしていた場合は初期値のuser情報を設定
-      if( userdata.ops !== undefined) userdata = userdata.ops[0]
-      
+      this.logger.debug(userdata)
       // 呼び名設定
       let callAs = this._replaceNN(userdata.nickname, tweet.user)
-        
+      this.logger.debug('call as : ' + callAs)
+      
       return new Promise((resolve) => {
 
         // 返信する
