@@ -36,8 +36,11 @@ const SakuyaBot = class {
     this.logger.info('SakuyaBot started.')
     this.client.openUserStream({
       data: this.read.bind(this),
-      error: (error) => console.log(error),
-      event: this.receive.bind(this)
+      event: this.receive.bind(this),
+      error: (error) => {
+        console.error(error)
+        this.logger.error(error)
+      }
     })
   }
 
