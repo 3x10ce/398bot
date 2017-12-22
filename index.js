@@ -55,6 +55,24 @@ let autoRemove = new FollowCrawler(client)
 autoRemove.start()
 
 
+// 結合しての動確がTwitterでつぶやかなければならないというのが面倒なので、
+// 標準入力をツイートデータとして与えられるようにした
+process.stdin.resume()
+process.stdin.setEncoding('utf8')
+process.stdin.on('data', function(chunk) {
+  // とりあえずshellからの入力しか想定しないため、chunkをそのままツイートにする
+  let tweet = {
+    text: chunk,
+    user: {
+      id_str: process.env.tester_adminUserId, 
+      screen_name: process.env.tester_adminUserScreenName,
+      name: process.env.tester_adminUserName}
+  }
+  sakuyaBot.read(tweet)
+})
+process.stdin.on('end', function() {
+})
+
 // heap log dump
 const PROFILE_DUMP_INTERVAL = 60000
 setInterval( (() => {
