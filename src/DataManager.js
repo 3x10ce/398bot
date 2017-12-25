@@ -150,7 +150,7 @@ const DataManager = class {
   sumDonation () {
     return this._query(
       'SELECT sum(amount) as Total from donates;'
-    ).then( (data) => data[0] )
+    ).then( (data) => data[0].Total )
   }
 
   /**
