@@ -195,7 +195,7 @@ const SakuyaBot = class {
           // 何か応答を行なった場合はログに残す
           if (result === null) return
           this.logger.debug(`[${result.id_str}]response: ${result.text}`)
-          console.log(result)
+          // console.log(result)
         })
       }
     }).catch((err) => {
