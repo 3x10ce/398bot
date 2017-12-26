@@ -1,8 +1,8 @@
 
+/* 各種モジュールのrequire */
 let SakuyaBot = require('./src/SakuyaBot')
 let DataManager = require('./src/DataManager')
 let Twitter = require('twitter')
-let TwitterClient = require('./src/TwitterClient')
 let FollowCrawler = require('./src/FollowingCrawler')
 let MySQL = require('mysql')
 let Scheduler = require('node-schedule')
@@ -14,7 +14,12 @@ let sakuyaReplies = require('./src/SakuyaReplies')
 // 環境変数よみこみ
 require('dotenv').config()
 
+// ローカル検証時はTwitterをモックに差し替える
+let TwitterClient = process.env.is_local ? require('./src/TwitterClient.mock') : require('./src/TwitterClient')
+
+
 // Twitter クライアントのinstance生成
+console.log(Twitter)
 let twitter = new Twitter ({
   consumer_key: process.env.consumer_key,
   consumer_secret: process.env.consumer_secret,
@@ -53,25 +58,6 @@ Scheduler.scheduleJob({
 
 let autoRemove = new FollowCrawler(client)
 autoRemove.start()
-
-
-// 結合しての動確がTwitterでつぶやかなければならないというのが面倒なので、
-// 標準入力をツイートデータとして与えられるようにした
-process.stdin.resume()
-process.stdin.setEncoding('utf8')
-process.stdin.on('data', function(chunk) {
-  // とりあえずshellからの入力しか想定しないため、chunkをそのままツイートにする
-  let tweet = {
-    text: chunk,
-    user: {
-      id_str: process.env.tester_adminUserId, 
-      screen_name: process.env.tester_adminUserScreenName,
-      name: process.env.tester_adminUserName}
-  }
-  sakuyaBot.read(tweet)
-})
-process.stdin.on('end', function() {
-})
 
 // heap log dump
 const PROFILE_DUMP_INTERVAL = 60000

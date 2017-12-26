@@ -174,9 +174,19 @@ const DataManager = class {
 
 module.exports = DataManager
 
+// let MySQL = require('mysql')
+// require('dotenv').config()
 
-// let dm = new DataManager(this.db)
-// dm.stashDonatedLog()
+// const connection = MySQL.createConnection({
+//   host : process.env.mysql_server,
+//   user : process.env.mysql_user,
+//   password: process.env.mysql_password,
+//   database: process.env.mysql_database
+// })
+// connection.connect()
+
+// let dm = new DataManager(connection)
+// dm.sumDonation()
 //   .then((rows) => { console.log(rows) })
 //   .catch((err) => { throw err })
 
