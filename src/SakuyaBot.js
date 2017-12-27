@@ -134,8 +134,11 @@ const SakuyaBot = class {
         } else if (tweet.text.match(/「(.+)」((と|って)呼んで)/)) {
           let newNickname = (tweet.text.match(/「(.+)」/) || [])[1]
           if (newNickname !== undefined) {
-            callAs = this._replaceNN(newNickname, tweet.user)
-            resolve(`${callAs}…って呼べばいいのね。`)
+            return this.db.setNickname(tweet.user, newNickname)
+              .then( () => {
+                callAs = this._replaceNN(newNickname, tweet.user)
+                resolve(`${callAs}…って呼べばいいのね。`)
+              })
 
           } else {
             resolve(null)
