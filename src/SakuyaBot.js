@@ -55,7 +55,7 @@ const SakuyaBot = class {
   // 毎日 0時に実行する
   daily_work (today) {
     // 秒単位のずれで日付が前後することを防ぐため 12時間分加算する
-    today = new Date(today.getTime() + 43200)
+    today = new Date(today.getTime() + 43200 * 1000)
 
     let m = today.getMonth() + 1
     let d = today.getDate()
