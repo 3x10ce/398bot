@@ -71,6 +71,8 @@ const SakuyaBot = class {
 
   read (tweet) {
     this.logger.info(`[${tweet.id_str}] @${tweet.user.screen_name}: ${tweet.text}`)
+    let callAs // ユーザへの呼び名
+
     return new Promise((resolve,reject) => {
 
       // 自身以外へのrepliesを除外する
@@ -96,14 +98,14 @@ const SakuyaBot = class {
     }).then( (userdata) => {
       this.logger.debug(userdata)
       // 呼び名設定
-      let callAs = this._replaceNN(userdata.nickname, tweet.user)
+      callAs = this._replaceNN(userdata.nickname, tweet.user)
       this.logger.debug('call as : ' + callAs)
       
       return new Promise((resolve) => {
 
         // 返信する
         if (tweet.text.match(/こんにちは/)) {
-          resolve(`${callAs}、こんにちは。`)
+          resolve(`<?CALLAS>、こんにちは。`)
   
         } else if (tweet.text.match(/紅茶/)) {
           let tea = this.teaSelector(tweet.user)
@@ -137,7 +139,7 @@ const SakuyaBot = class {
             return this.db.setNickname(tweet.user, newNickname)
               .then( () => {
                 callAs = this._replaceNN(newNickname, tweet.user)
-                resolve(`${callAs}…って呼べばいいのね。`)
+                resolve(`<?CALLAS>…って呼べばいいのね。`)
               })
 
           } else {
@@ -193,6 +195,9 @@ const SakuyaBot = class {
     }).then((reply) => {
       // ツイートがある場合はツイートする
       if (reply !== null) {
+        // パラメータの置き換え
+        reply = reply.replace(/<\?CALLAS>/g, callAs)
+        
         this.client.tweet(reply, tweet).then((result) => {
           
           // 何か応答を行なった場合はログに残す
