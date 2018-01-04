@@ -164,7 +164,7 @@ const DataManager = class {
         .then( (sum) => {
           // 合計量を昨日の分として donatesByDate に挿入
           let yesterday = new Date(Date.now() - 86400 * 1000).toISOString().slice(0,10)
-          return this._query( 'INSERT into donatesByDate (donatedAtDate, amount) value (?, ?)', [yesterday, sum.Total] )
+          return this._query( 'INSERT into donatesByDate (donatedAtDate, amount) value (?, ?)', [yesterday, sum] )
         }).then( () => 
           this._query( 'DELETE from donates;')
         )
