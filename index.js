@@ -15,7 +15,7 @@ let sakuyaReplies = require('./src/SakuyaReplies')
 require('dotenv').config()
 
 // ローカル検証時はTwitterをモックに差し替える
-let TwitterClient = process.env.is_local ? require('./src/TwitterClient.mock') : require('./src/TwitterClient')
+let TwitterClient = process.env.is_local ? require('./src/TwitterClient.local') : require('./src/TwitterClient')
 
 
 // Twitter クライアントのinstance生成

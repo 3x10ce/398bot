@@ -1,6 +1,6 @@
 
 /**
- * TwitterClient.mock.js
+ * TwitterClient.local.js
  * Twitterをbotが利用しやすいようにwrapしたもの
  * ★ローカルの検証用に利用します。
  */
@@ -68,7 +68,7 @@ const TwitterClient = class {
       params = { status: text }
     }
     // ツイートした結果は標準出力に吐く
-    process.stdout.write(`[TWEET] ${params.status} [reply_to: ${params.in_reply_to_status_id}]`)
+    process.stdout.write(`[TWEET] ${params.status} [reply_to: ${params.in_reply_to_status_id}]\n`)
     return Promise.resolve(params)
   }
 
