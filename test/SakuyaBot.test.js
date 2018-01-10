@@ -5,67 +5,16 @@ let sinon = require('sinon')
 
 let SakuyaBot = require('../src/SakuyaBot')
 
-// 適当なtweetのmockを作成する
-let createTweetMock = () => ({
-  id: 0,
-  id_str: 0,
-  text: 'none',
-  user: createUserMock()
-})
-
 let mockPromise = (value) => Promise.resolve(value)
 
-// 適当なuser data を生成する
-let createUserDataMock = () => ({
-  _id: '0',
-  name: 'Masashi',
-  nickname: ':NAME:さん',
-  lovelity: 20
-})
-// dbのmock/stub
-let db = {
-  createUser: (user) => user,
-  getUser: (id) => mockPromise(createUserDataMock(id)),
-  setNickname: (id, nickname) => mockPromise([id, nickname]),
-  setBirthday: (id, m, d) => mockPromise([id, m, d]),
-  increaseLovelity: (id, lovelity) => mockPromise([id, lovelity]),
-  addDonateLog: (name, amount) => mockPromise(name, amount),
-  userIsDonated: () => mockPromise(false),
-  sumDonation: () => mockPromise(1000),
-  stashDonation: () => mockPromise()
-}
-// logのmock
-let logger = {
-  trace: (l) => l,
-  debug: (l) => l,
-  info: (l) => l,
-  warn: (l) => l,
-  error: (l) => l,
-  fatal: (l) => l
-}
+// 各種mock
+let twitter = require('./mock/Twitter.mock')
+let db = require('./mock/Database.mock')
+let utils = require('./mock/Utils.mock')
+let client = require('./mock/TwitterClient.mock')
+let rand = require('./mock/Randomizer.mock')
 
-// 適当なUserのmockを作成する
-let createUserMock = () => ({
-  id: 12345,
-  id_str: '12345',
-  name: 'Annonymous',
-  screen_name: 'null'
-})
-
-// clientのmock
-let client = {
-  verifyCredentials: () => mockPromise({id_str:'0000', name: 'SakuyaTest', screen_name: '398Bot'}),
-  tweet: (text) => mockPromise(text),
-  follow: (id) => mockPromise(id)
-}
-
-let rand = {
-  genInt: () => (0),
-  gen: () => (0.0),
-  choice: (list) => list[0]
-}
-
-let sakuyaBot = new SakuyaBot(client, db, logger, rand)
+let sakuyaBot = new SakuyaBot(client, db, utils.logger, rand)
 sakuyaBot.teaSelector = () => ({name: '(紅茶名)', language_of: '(花言葉)', rarity: 1})
 
 // リアクションプラグインのmockを流し込む
@@ -87,7 +36,7 @@ describe('口上反応テスト', () => {
   })
 
   it('反応しない', () => {
-    let tweet = createTweetMock()
+    let tweet = twitter.tweetMock()
 
     tweet.text = '@398Bot ignored tweet'
     // ツイートを返さないことを期待
@@ -98,7 +47,7 @@ describe('口上反応テスト', () => {
       .catch((err) => { throw err })
   })
   it('リアクションプラグイン', () => {
-    let tweet = createTweetMock()
+    let tweet = twitter.tweetMock()
 
     tweet.text = '@398Bot テスト'
     // リアクションプラグインからリプライ文が生成されることを期待
@@ -109,7 +58,7 @@ describe('口上反応テスト', () => {
       .catch((err) => { throw err })
   })
   it('紅茶を入れる', () => {
-    let tweet = createTweetMock()
+    let tweet = twitter.tweetMock()
     tweet.text = '@398Bot 紅茶'
 
     // テスト返信を期待
@@ -122,7 +71,7 @@ describe('口上反応テスト', () => {
       .catch((err) => { throw err })
   })
   it('誕生日1', () => {
-    let tweet = createTweetMock()
+    let tweet = twitter.tweetMock()
     tweet.text = '@398Bot 誕生日は10月15日'
 
     // テスト返信を期待
@@ -135,7 +84,7 @@ describe('口上反応テスト', () => {
       .catch((err) => { throw err })
   })
   it('誕生日2', () => {
-    let tweet = createTweetMock()
+    let tweet = twitter.tweetMock()
     tweet.text = '@398Bot 誕生日は1月31日'
 
     // テスト返信を期待
@@ -148,7 +97,7 @@ describe('口上反応テスト', () => {
       .catch((err) => { throw err })
   })
   it('誕生日3', () => {
-    let tweet = createTweetMock()
+    let tweet = twitter.tweetMock()
     tweet.text = '@398Bot 誕生日は12月1日'
 
     // テスト返信を期待
@@ -161,7 +110,7 @@ describe('口上反応テスト', () => {
       .catch((err) => { throw err })
   })
   it('誕生日4', () => {
-    let tweet = createTweetMock()
+    let tweet = twitter.tweetMock()
     tweet.text = '@398Bot 誕生日は2月29日'
 
     // テスト返信を期待
@@ -175,7 +124,7 @@ describe('口上反応テスト', () => {
   })
   it('不正な誕生日のガード', () => {
     let tweet = []
-    for(let i = 0; i < 5; i++) tweet.push(createTweetMock())
+    for(let i = 0; i < 5; i++) tweet.push(twitter.tweetMock())
     
     tweet[0].text = '@398Bot 誕生日は0月14日'
     tweet[1].text = '@398Bot 誕生日は13月20日'
@@ -191,7 +140,7 @@ describe('口上反応テスト', () => {
 
   })
   it('献血', () => {
-    let tweet = createTweetMock()
+    let tweet = twitter.tweetMock()
     tweet.text = '@398Bot 献血'
 
     // テスト返信を期待
@@ -205,7 +154,7 @@ describe('口上反応テスト', () => {
   })
 
   it('すでに献血済み', () => {
-    let tweet = createTweetMock()
+    let tweet = twitter.tweetMock()
     let db_stub = sinon.stub(db, 'userIsDonated')
     db_stub.returns(mockPromise(true))
     tweet.text = '@398Bot 献血'
@@ -221,7 +170,7 @@ describe('口上反応テスト', () => {
   })
 
   it('呼び名設定', () => {
-    let tweet = createTweetMock()
+    let tweet = twitter.tweetMock()
     tweet.text = '@398Bot 「:NAME:君」って呼んで'
 
     // テスト返信を期待
@@ -235,7 +184,7 @@ describe('口上反応テスト', () => {
   })
 
   it('好感度チェック', () => {
-    let tweet = createTweetMock()
+    let tweet = twitter.tweetMock()
 
     tweet.text = '@398Bot 私のことどう思う？'
     
@@ -248,7 +197,7 @@ describe('口上反応テスト', () => {
   })
 
   it('リプライでないツイートには反応しない', () => {
-    let tweet = createTweetMock()
+    let tweet = twitter.tweetMock()
     tweet.text = 'テスト'
 
     // テスト返信しないことを期待
@@ -260,7 +209,7 @@ describe('口上反応テスト', () => {
 
   })
   it('他の人あてのリプライには反応しない', () => {
-    let tweet = createTweetMock()
+    let tweet = twitter.tweetMock()
     tweet.text = '@3x10ce テスト'
 
     // テスト返信しないことを期待
@@ -272,7 +221,7 @@ describe('口上反応テスト', () => {
 
   })
   it('自分以外へのリプライが混ざっている場合は反応しない', () => {
-    let tweet = createTweetMock()
+    let tweet = twitter.tweetMock()
     tweet.text = '@398Bot @3x10ce テスト'
 
     // テスト返信しないことを期待
@@ -283,7 +232,7 @@ describe('口上反応テスト', () => {
       .catch((err) => { throw err })
   })
   it('自分以外へのリプライが混ざっている場合は反応しない', () => {
-    let tweet = createTweetMock()
+    let tweet = twitter.tweetMock()
     tweet.text = '@398Bot @3x10ce テスト'
 
     // テスト返信しないことを期待
@@ -294,7 +243,7 @@ describe('口上反応テスト', () => {
       .catch((err) => { throw err })
   })
   it('ツイート途中に自分の@が混ざっている場合は反応しない', () => {
-    let tweet = createTweetMock()
+    let tweet = twitter.tweetMock()
     tweet.text = 'これは @398Bot テスト'
 
     // テスト返信しないことを期待
@@ -353,8 +302,8 @@ describe('フォローチェックテスト', () => {
   it('通常のフォロー返しフロー', () => {
     let event = {
       event: 'follow',
-      target: createUserMock(),
-      source: createUserMock()
+      target: twitter.userMock(),
+      source: twitter.userMock()
     }
     // F/F比100%
     event.source.followers_count = 100
@@ -380,8 +329,8 @@ describe('フォローチェックテスト', () => {
   it('スパムのフォロー返しフロー', () => {
     let event = {
       event: 'follow',
-      target: createUserMock(),
-      source: createUserMock()
+      target: twitter.userMock(),
+      source: twitter.userMock()
     }
     // F/F比10%
     event.source.followers_count = 10
@@ -398,8 +347,8 @@ describe('フォローチェックテスト', () => {
   it('作成直後のアカウント(フォロワー0人', () => {
     let event = {
       event: 'follow',
-      target: createUserMock(),
-      source: createUserMock()
+      target: twitter.userMock(),
+      source: twitter.userMock()
     }
     // F/F比0%
     event.source.followers_count = 0
