@@ -217,22 +217,36 @@ const SakuyaBot = class {
     
 
   receive (event) {
-    // 自身で発生したイベントは無視する
-    if (event.source.screen_name === this.screen_name) return
-    this.logger.info(`received event @${event.source.screen_name}: ${event.event}.`)
 
-    // フォローイベント
-    if (event.event === 'follow') {
-      // Follower数がFollow数の15%以上であればフォローする
-      if (event.source.friends_count * 0.15 < event.source.followers_count) {
-        return this.client.follow(event.source.id_str).then((result) => {
-          this.logger.info(`re-follow: @${event.source.screen_name}`)
+    return new Promise((resolve, reject) => {
+      // 自身で発生したイベントは無視する
+      if (event.source.screen_name === this.screen_name) reject()
+      resolve()
+    }).then(() => {
+      this.logger.info(`received event @${event.source.screen_name}: ${event.event}.`)
+      
+      // イベントタイプを調べる
+      switch (event.event) {
+      case 'follow':
+        // フォローイベントがきたらフォロー返しをする
+        // (フォロー返し条件: Follower数がFollow数の15%以上)
+        if (event.source.friends_count * 0.15 < event.source.followers_count) 
+          return this.client.follow(event.source.id_str)
+        else return null
 
-          return result
-        })
+      default:
+        return null
       }
-    }
-    return Promise.resolve(null)
+    }).then((result) => {
+      switch (event.event) {
+      case 'follow':
+        this.logger.info(`re-follow: @${event.source.screen_name}`)
+        break
+        
+      }
+
+      return result
+    })
   }
 
   /******** 以降はprivate methodとして運用 ********/

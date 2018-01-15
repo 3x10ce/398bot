@@ -291,21 +291,12 @@ describe('フォローチェックテスト', () => {
     event.source.followers_count = 100
     event.source.friends_count = 100
 
-    /* 
+     
     // フォローを返すことを期待
     client_mock.expects('follow').once().withArgs('12345')
 
-    // Promise.resolve()
-    //   .then(() => sakuyaBot.receive(event))
-    sakuyaBot.receive(event)
+    return sakuyaBot.receive(event)
       .then(() => client_mock.verify())
-      .catch((err) => { throw err })
-    */
-
-    // 2017/11/07
-    // 2時間ほど格闘してみたが、何をやってもpassしなくなってしまった。
-    // 一旦、なにもせず素通りするテストケースにさせておく。
-    // issueをたて、原因が判明次第テストコードを書き直す。
   })
 
   it('スパムのフォロー返しフロー', () => {
