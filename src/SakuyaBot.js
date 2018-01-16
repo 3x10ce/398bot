@@ -8,6 +8,10 @@ const SakuyaBot = class {
     this.db = db
     this.logger = logger
     this.rand = rand
+    this.today = {
+      month: new Date().getMonth() + 1,
+      day:   new Date().getDate()
+    }
 
     // ツイートテキストを引数として、リアクションを返却する関数軍を
     // SakuyaBotに任意に組み込むことができる機能を提供する。
@@ -53,14 +57,16 @@ const SakuyaBot = class {
   }
 
   // 毎日 0時に実行する
-  daily_work (today) {
-    // 秒単位のずれで日付が前後することを防ぐため 12時間分加算する
-    today = new Date(today.getTime() + 43200 * 1000)
+  daily_work (newDay) {
+    newDay = new Date(newDay.getTime() + 43200 * 1000)
 
-    let m = today.getMonth() + 1
-    let d = today.getDate()
+    this.today = {
+      month: newDay.getMonth() + 1,
+      day:   newDay.getDate()
+    }
+
     return this.db.sumDonation().then( (amount) => {
-      return this.client.tweet(`${m}月 ${d}日になったわね。 先日は ${amount} ml の献血をいただきましたわ。`)      
+      return this.client.tweet(`${this.today.month}月 ${this.today.day}日になったわね。 先日は ${amount} ml の献血をいただきましたわ。`)      
     }).then(() => {
       return this.db.stashDonatedLog()
     }).catch((err) => {
@@ -74,15 +80,12 @@ const SakuyaBot = class {
     let callAs // ユーザへの呼び名
 
     return new Promise((resolve,reject) => {
+      // リツイートは除外
+      if (tweet.retweeted_status) reject()
 
-      // 自身以外へのrepliesを除外する
-      let replies = (tweet.text.match(/@[0-9a-zA-Z]+/g) || []).filter((u) => u !== `@${this.screen_name}`)
-      if (replies.length) reject() 
-      
-      // 先頭が@でないツイートには反応しない
-      if (!tweet.text.startsWith('@')) reject() 
-      
+      // リツイートを除外して残るのは、followしている人のタイムラインのみになるはず。
       resolve()
+
     }).then(() => {
       // ユーザの情報をDBから取得する
       return this.db.getUser(tweet.user)
@@ -100,9 +103,23 @@ const SakuyaBot = class {
       // 呼び名設定
       callAs = this._replaceNN(userdata.nickname, tweet.user)
       this.logger.debug('call as : ' + callAs)
-      
-      return new Promise((resolve) => {
 
+      return new Promise((resolve, reject) => {
+
+        // 誕生日お祝いツイートのみ、自身へのリプライでなくても反応する
+        if (userdata.birth_m && userdata.birth_d &&
+          userdata.birth_m === this.today.month &&
+          userdata.birth_d === this.today.day) {
+          resolve(`そういえば、今日がお誕生日らしいわね。おめでとう、<?CALLAS>。`)
+        }
+
+        // 自身以外へのrepliesを除外する
+        let replies = (tweet.text.match(/@[0-9a-zA-Z]+/g) || []).filter((u) => u !== `@${this.screen_name}`)
+        if (replies.length) reject() 
+        
+        // 先頭が@でないツイートには反応しない
+        if (!tweet.text.startsWith('@')) reject() 
+        
         // 返信する
         if (tweet.text.match(/こんにちは/)) {
           resolve(`<?CALLAS>、こんにちは。`)

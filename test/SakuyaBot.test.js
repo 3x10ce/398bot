@@ -16,6 +16,7 @@ let rand = require('./mock/Randomizer.mock')
 
 let sakuyaBot = new SakuyaBot(client, db, utils.logger, rand)
 sakuyaBot.teaSelector = () => ({name: '(紅茶名)', language_of: '(花言葉)', rarity: 1})
+sakuyaBot.today = { month: 6, day: 15 }
 
 // リアクションプラグインのmockを流し込む
 sakuyaBot.addReactionPlugin( (tweet) => {
@@ -131,6 +132,23 @@ describe('口上反応テスト', () => {
     return Promise.all(tweet.map((v) => sakuyaBot.read(v))) 
       .then(() => client_mock.verify())
 
+  })
+  it('誕生日お祝い', () => {
+    let tweet = twitter.tweetMock()
+    tweet.text = 'テスト'
+    let todayTmp = sakuyaBot.today
+    sakuyaBot.today = { month: 1, day: 1}
+
+    // お祝いしてくれることを期待
+    client_mock.expects('tweet').once().withArgs(
+      'そういえば、今日がお誕生日らしいわね。おめでとう、Annonymousさん。', tweet
+    )
+
+    return sakuyaBot.read(tweet)
+      .then(() => {
+        client_mock.verify()
+        sakuyaBot.today = todayTmp
+      })
   })
   it('献血', () => {
     let tweet = twitter.tweetMock()
