@@ -69,6 +69,8 @@ const SakuyaBot = class {
       return this.client.tweet(`${this.today.month}月 ${this.today.day}日になったわね。 先日は ${amount} ml の献血をいただきましたわ。`)      
     }).then(() => {
       return this.db.stashDonatedLog()
+    }).then(() => {
+      return this.db.clearCelebratedBirthdayFlags()
     }).catch((err) => {
       this.logger.error(err)
       this.logger.trace(err.trace)
@@ -108,9 +110,11 @@ const SakuyaBot = class {
 
         // 誕生日お祝いツイートのみ、自身へのリプライでなくても反応する
         if (userdata.birth_m && userdata.birth_d &&
+          !userdata.celebratedBirthday &&
           userdata.birth_m === this.today.month &&
           userdata.birth_d === this.today.day) {
-          resolve(`そういえば、今日がお誕生日らしいわね。おめでとう、<?CALLAS>。`)
+          return this.db.setCelebratedBirthdayFlag(tweet.user)
+            .then(() => resolve(`そういえば、今日がお誕生日らしいわね。おめでとう、<?CALLAS>。`))
         }
 
         // 自身以外へのrepliesを除外する

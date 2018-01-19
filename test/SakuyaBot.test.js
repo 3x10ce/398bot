@@ -137,17 +137,41 @@ describe('口上反応テスト', () => {
     let tweet = twitter.tweetMock()
     tweet.text = 'テスト'
     let todayTmp = sakuyaBot.today
+    let getUserTmp = sakuyaBot.db.getUser
     sakuyaBot.today = { month: 1, day: 1}
 
     // お祝いしてくれることを期待
     client_mock.expects('tweet').once().withArgs(
       'そういえば、今日がお誕生日らしいわね。おめでとう、Annonymousさん。', tweet
     )
+    return sakuyaBot.read(tweet)
+      .then(() => {
+        client_mock.verify()
+        sakuyaBot.today = todayTmp
+        sakuyaBot.db.getUser = getUserTmp
+      })
+  })
+  it('誕生日お祝い(2回目以降は無視する)', () => {
+    let tweet = twitter.tweetMock()
+    tweet.text = 'テスト'
+    let todayTmp = sakuyaBot.today
+    sakuyaBot.today = { month: 1, day: 1 }
+    let getUserTmp = sakuyaBot.db.getUser
+    sakuyaBot.db.getUser = (id) => {
+      getUserTmp(id)
+        .then((user) => {
+          user.celebratedBirthday = true
+          return user
+        })
+    }
+    // お祝いしてくれないことを期待
+    client_mock.expects('tweet').never()
 
     return sakuyaBot.read(tweet)
       .then(() => {
         client_mock.verify()
         sakuyaBot.today = todayTmp
+        sakuyaBot.db.getUser = getUserTmp
       })
   })
   it('献血', () => {

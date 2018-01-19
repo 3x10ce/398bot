@@ -6,7 +6,8 @@ let createUserDBMock = (id) => {
     nickname: ':NAME:さん',
     birth_m: 1,
     birth_d: 1,
-    lovelity: 20
+    lovelity: 20,
+    celebratedBirthday: false
   }
 }
 
@@ -20,7 +21,9 @@ let db = {
   addDonateLog: (name, amount) => Promise.resolve(name, amount),
   userIsDonated: () => Promise.resolve(false),
   sumDonation: () => Promise.resolve(1000),
-  stashDonation: () => Promise.resolve()
+  stashDonation: () => Promise.resolve(),
+  setCelebratedBirthdayFlag: () => Promise.resolve(),
+  clearCelebratedBirthdayFlags: () => Promise.resolve()
 }
 
 module.exports = db

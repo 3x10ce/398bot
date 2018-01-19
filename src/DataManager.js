@@ -170,6 +170,24 @@ const DataManager = class {
         )
     })
   }
+  
+  /** 
+   * 指定したユーザの誕生日お祝いフラグを設定します。
+   * @param {UserObject} user
+   * @return update結果
+   */
+  setCelebratedBirthdayFlag (user) {
+    return this._query(
+      'UPDATE users set celebratedBirthday = true where id = ?;',[user.id_str])
+  }
+  /** 
+   * 誕生日お祝いフラグを初期化します。
+   * @return update結果
+   */
+  clearCelebratedBirthdayFlags () {
+    return this._query(
+      'UPDATE users set celebratedBirthday = false where celebratedBirthday = true;')
+  }
 }
 
 module.exports = DataManager
@@ -235,10 +253,10 @@ module.exports = DataManager
  * @todo 以下のメモ書きは後ほど実装に利用する。
  * 
  * table の create
- * create table users ( id nvarchar(64) primary key, nickname nvarchar(32) default ':NAME:さん', birth_m int, birth_d int, lovelity int default 5 );
+ * create table users ( id nvarchar(64) primary key, nickname nvarchar(32) default ':NAME:さん', birth_m int, birth_d int, lovelity int default 5, celebratedBirthday bool);
  * create table donates (id int primary key auto_increment, donatedAt datetime not null, userId nvarchar(64) not null, amount int not null);
  * create table donatesByDate ( donatedAtDate date primary key, amount int not null );
- * 
+ * create table cerebrateUsers ( id nvarchar(64) primary key ) 
  * 今日の献血量合計を取得
  * select sum(amount), date(donatedAt) as donatedAtDate from donates where donatedAt >= CURDATE() group by donatedAtDate;
  * 
