@@ -9,9 +9,10 @@
 
   <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
   <style type="text/css">
-  header {
-    margin-bottom: 3em;
-  }
+  header { margin-bottom: 3em; }
+  .bs-component { margin-bottom: 3em; }
+
+  .bs-docs-section h1 { border-bottom: gray solid 1px; }
   </style>
 
   <!--[if lt IE 9]>
@@ -54,6 +55,14 @@
 
   <div class="bs-docs-section">
     <div class="page-header">
+      <h1>このbotは？</h1>
+    </div>
+    <div class="bs-component">
+      <p>SakuyaBotは、ゲーム「東方Project」シリーズに登場するキャラクター、「十六夜咲夜」を模したツイッターBOTです。</p>      
+    </div>
+  </div>
+  <div class="bs-docs-section">
+    <div class="page-header">
       <h1>できること</h1>
     </div>
     <div class="bs-component">
@@ -70,20 +79,70 @@
     </div>
 
     <div class="bs-component">
+      <h3>リプライ反応</h3>
+      <p>Botに対してリプライを送ると、リプライに含まれる語句に応じて何かしらの反応が返ってくることがあります。</p>
+    </div>
+
+    <div class="bs-component">
       <h3>紅茶</h3>
-      <p>
-        「紅茶」とリプライを送ると今日の紅茶を提供します。咲夜さんのチョイスは変わっているので、ちょっと変わったお茶も出るかも知れません。
-      </p>
+      <p>「紅茶」とリプライを送ると今日の紅茶を提供します。咲夜さんのチョイスは変わっているので、ちょっと変わったお茶も出るかも知れません。</p>
+      <p>また、お茶に使った草花の花言葉も教えてくれます。咲夜さんのbotはためになるなぁ！（これもごく稀に、どこで覚えたのかわからない不思議な花言葉を返したりします。）</p>
     </div>
 
     <div class="bs-component">
       <h3>献血</h3>
-      <p>
-        「献血」とリプライを送ると、咲夜さんが仕える吸血鬼のお嬢様方のごはんとなる血を捧げることができます。
-      </p>
+      <p>「献血」とリプライを送ると、咲夜さんが仕える吸血鬼のお嬢様方のごはんとなる血を捧げることができます。1人につき1日1回のみの制限があります。</p>
+    </div>
+
+    <div class="bs-component">
+      <h3>誕生日設定・お祝い</h3>
+      <p>「誕生日はX月X日」とリプライを送ることで、咲夜さんに誕生日を教えることができます。教えておくと、誕生日になった日の最初のツイートに対してお祝いのリプライを送ってくれます。</p>
+    </div>
+
+     <div class="bs-component">
+      <h3>好感度</h3>
+      <p>Botに対して送るリプライとその反応によって、フォローしている人に対する好感度が上下します。好感度が上がると反応してくれるリプライのパターンが充実していきます。</p>
+    </div>
+
+    <div class="bs-component">
+      <h3>呼び名</h3>
+      <p>botに呼んでほしい呼び名を設定してあげることができます。リプライで「「(呼んでほしい呼び名)」って呼んで」と送ることで設定可能です。</p>
+      <p>置換文字列 <b>:NAME:</b>(現在設定しているツイッターのユーザ名に置き換えられる)が使用できます。</p>
     </div>
   </div>
 
+  <div class="bs-docs-section">
+    <h1>技術的な話</h1>
+    
+    <div class="bs-component">
+      <h3>咲夜さんのお部屋</h3>
+      <p>AWS(Amazon Web Service)上でEC2(クラウドサーバ)を立て、そこで稼働しています。お値段を抑えるためアメリカリージョンを使用し、スポットインスタンスで稼働しています。</p>
+      <p>BotはNode.jsで動いており、pm2でデーモン化させています。</p>
+    </div>
+
+    <div class="bs-component">
+      <h3>反応パターンの実装</h3>
+      <p>以下のような感じのJSONファイル(リアクションプラグインと勝手に呼んでる)を記述し、botに読み込ませています。</p>
+      <pre><code>{
+  trigger_word: "こんに?ち[はわ]"  // トリガーワードを正規表現で指定
+  reply_patterns: [       // 返答するメッセージの配列。Botでこのパターンからランダムに1つ選択する。
+    "リプライ1",
+    "リプライ2",
+    "リプライ3"
+  ],
+  requires: {             // 反応する際の条件をここに記載する。
+    date_m: 12,           // 特定の日付限定のリアクションはdate_mとdate_dにその日付を設定する。
+    date_d: 25,
+    min_lovelity: 20      // 必要な好感度の値(最小値)を設定する。
+  },
+  lovelity: 2             // 反応した際に上昇する好感度の数値を設定する。
+},
+{
+  trigger_word: "ほげほげ",
+  ... </code></pre>
+    </div>
+
+  </div>
   <div class="bs-docs-section">
     <div class="page-header">
       <h1>こまったときは</h1>
